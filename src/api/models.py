@@ -1,12 +1,19 @@
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    password_hash = db.Column(db.String(128))
+    first_name = db.Column(db.String(120))
+    last_name = db.Column(db.String(120))
+    username = db.Column(db.String(120))
+    gender = db.Column(db.String(120))
+    birth_date = db.Column(db.Date)
+    phone = db.Column(db.String(120))
+    location = db.Column(db.String(120))
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -15,5 +22,17 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            # do not serialize the password, its a security breach
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "username": self.username,
+            "gender": self.gender,
+            "birth_date": self.birth_date.isoformat() if self.birth_date else None,
+            "phone": self.phone,
+            "location": self.location
         }
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
