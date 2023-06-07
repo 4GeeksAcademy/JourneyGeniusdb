@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Product, Service
 from api.utils import generate_sitemap, APIException
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
@@ -54,3 +54,31 @@ def protected():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
+@api.route('/products', methods=['POST'])
+@jwt_required
+def create_product():
+    # Adicionar um novo produto
+    current_user = get_jwt_identity()
+    data = request.get_json()
+    new_product = Product(user_id=current_user.id, 
+                          name=data['name'], 
+                          description=data['description'],
+                          category=data['category'],
+                          condition=data['condition'])
+    db.session.add(new_product)
+    db.session.commit()
+    return jsonify(new_product.serialize()), 201
+
+@api.route('/services', methods=['POST'])
+@jwt_required
+def create_service():
+    # Adicionar um novo serviço
+    current_user = get_jwt_identity()
+    data = request.get_json()
+    new_service = Service(user_id=current_user.id, 
+                          name=data['name'], 
+                          description=data['description'],
+                          category=data['category'])
+    db.session.add(new_service)
+    db.session.commit()
+    return jsonify(new_service.serialize()), 201
