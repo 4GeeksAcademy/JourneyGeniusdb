@@ -242,3 +242,68 @@ def delete_trade(trade_id):
     db.session.commit()
 
     return {"message": "trade deleted successfully"}, 200
+
+    # Criar uma nova wishlist
+@api.route('/users/<int:user_id>/wishlist', methods=['POST'])
+def create_wishlist(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return {"error": "User not found"}, 404
+
+    wishlist = Wishlist(user_id=user_id)
+    db.session.add(wishlist)
+    db.session.commit()
+
+    return {"message": "Wishlist created successfully"}, 201
+
+# Obter a wishlist de um usuário
+@api.route('/users/<int:user_id>/wishlist', methods=['GET'])
+def get_wishlist(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return {"error": "User not found"}, 404
+
+    wishlist = user.wishlist
+    if wishlist is None:
+        return {"error": "Wishlist not found"}, 404
+
+    return {"wishlist": [item.to_dict() for item in wishlist.items]}, 200
+
+# Adicionar um produto ou serviço aos favoritos de um usuário
+@api.route('/users/<int:user_id>/favorites', methods=['POST'])
+def add_favorite(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return {"error": "User not found"}, 404
+
+    data = request.get_json()
+    product_id = data.get('product_id')
+    service_id = data.get('service_id')
+
+    if product_id is not None:
+        product = Product.query.get(product_id)
+        if product is None:
+            return {"error": "Product not found"}, 404
+        favorite = Favorite(user_id=user_id, product_id=product_id)
+    elif service_id is not None:
+        service = Service.query.get(service_id)
+        if service is None:
+            return {"error": "Service not found"}, 404
+        favorite = Favorite(user_id=user_id, service_id=service_id)
+    else:
+        return {"error": "Product or service id is required"}, 400
+
+    db.session.add(favorite)
+    db.session.commit()
+
+    return {"message": "Favorite added successfully"}, 201
+
+# Obter os favoritos de um usuário
+@api.route('/users/<int:user_id>/favorites', methods=['GET'])
+def get_favorites(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return {"error": "User not found"}, 404
+
+    favorites = user.favorites
+    return {"favorites": [favorite.to_dict() for favorite in favorites]}, 200
