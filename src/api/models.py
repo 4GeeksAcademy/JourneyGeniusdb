@@ -42,12 +42,32 @@ class Product(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(120), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    category = db.Column(db.String(120), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('product_category.id'))  # nova coluna
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('product_subcategory.id'))  # nova coluna
     condition = db.Column(db.String(120), nullable=False)
     estimated_value = db.Column(db.Float, nullable=False)
     location = db.Column(db.String(120))
 
     user = db.relationship('User', backref='products')
+    category = db.relationship('ProductCategory')  # nova relação
+    subcategory = db.relationship('ProductSubcategory')  # nova relação
+
+class ProductCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    subcategories = db.relationship('ProductSubcategory', backref='category', lazy=True)
+
+    def __repr__(self):
+        return f'<ProductCategory {self.name}>'
+
+class ProductSubcategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('product_category.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<ProductSubcategory {self.name}>'
+
 
 class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True)
