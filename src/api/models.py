@@ -53,20 +53,33 @@ class Product(db.Model):
     subcategory = db.relationship('ProductSubcategory')  # nova relação
 
 class ProductCategory(db.Model):
+    __tablename__ = 'product_category'
+    
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
-    subcategories = db.relationship('ProductSubcategory', backref='category', lazy=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    subcategories = db.relationship('ProductSubcategory', backref='product_category')
 
-    def __repr__(self):
-        return f'<ProductCategory {self.name}>'
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'subcategories': [subcategory.to_dict() for subcategory in self.subcategories]
+        }
+
 
 class ProductSubcategory(db.Model):
+    __tablename__ = 'product_subcategory'
+    
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('product_category.id'), nullable=False)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('product_category.id'))
 
-    def __repr__(self):
-        return f'<ProductSubcategory {self.name}>'
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'category_id': self.category_id
+        }
 
 
 class Service(db.Model):
@@ -81,20 +94,32 @@ class Service(db.Model):
     user = db.relationship('User', backref='services')
 
 class ServiceCategory(db.Model):
+    __tablename__ = 'service_categories'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     subcategories = db.relationship('ServiceSubcategory', backref='category', lazy=True)
 
-    def __repr__(self):
-        return f'<ServiceCategory {self.name}>'
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "subcategories": [subcategory.to_dict() for subcategory in self.subcategories]
+        }
+
 
 class ServiceSubcategory(db.Model):
+    __tablename__ = 'service_subcategories'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('service_category.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('service_categories.id'), nullable=False)
 
-    def __repr__(self):
-        return f'<ServiceSubcategory {self.name}>'
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "category_id": self.category_id
+        }
+
 
 
 class Trade(db.Model):

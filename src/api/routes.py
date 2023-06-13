@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Product, Service, Message
+from api.models import db, User, Product, Service, Message, Trade, ProductCategory, ProductSubcategory, ServiceCategory, ServiceSubcategory
 from api.utils import generate_sitemap, APIException
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
@@ -307,3 +307,28 @@ def get_favorites(user_id):
 
     favorites = user.favorites
     return {"favorites": [favorite.to_dict() for favorite in favorites]}, 200
+
+@api.route('/product-categories', methods=['GET'])
+def get_product_categories():
+    categories = ProductCategory.query.all()
+    return jsonify([category.to_dict() for category in categories]), 200
+
+@api.route('/product-subcategories', methods=['GET'])
+def get_product_subcategories():
+    subcategories = ProductSubcategory.query.all()
+    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
+
+@api.route('/service-categories', methods=['GET'])
+def get_service_categories():
+    categories = ServiceCategory.query.all()
+    return jsonify([category.to_dict() for category in categories]), 200
+
+@api.route('/service-subcategories', methods=['GET'])
+def get_service_subcategories():
+    subcategories = ServiceSubcategory.query.all()
+    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
+
+@api.route('/product-categories/<int:category_id>/subcategories', methods=['GET'])
+def get_product_subcategories_by_category(category_id):
+    subcategories = ProductSubcategory.query.filter_by(category_id=category_id).all()
+    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
