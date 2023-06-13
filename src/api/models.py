@@ -80,6 +80,23 @@ class Service(db.Model):
 
     user = db.relationship('User', backref='services')
 
+class ServiceCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    subcategories = db.relationship('ServiceSubcategory', backref='category', lazy=True)
+
+    def __repr__(self):
+        return f'<ServiceCategory {self.name}>'
+
+class ServiceSubcategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('service_category.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<ServiceSubcategory {self.name}>'
+
+
 class Trade(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     offering_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
