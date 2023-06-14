@@ -48,6 +48,47 @@ def login():
     access_token = create_access_token(identity=email)
     return jsonify(access_token=access_token)
 
+@api.route('/user', methods=['GET'])
+@jwt_required()
+def get_user_info():
+    # Obtém o email do token de acesso
+    user_email = get_jwt_identity()
+    # Busca o usuário com base no email
+    user = User.query.filter_by(email=user_email).first()
+    # Se o usuário não for encontrado, retorne um erro
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+    # Retorna as informações do usuário como JSON
+    return jsonify(user.to_dict()), 200
+
+
+@api.route('/user', methods=['PUT'])
+@jwt_required()
+def update_user_info():
+    # Obtém o email do token de acesso
+    user_email = get_jwt_identity()
+    # Busca o usuário com base no email
+    user = User.query.filter_by(email=user_email).first()
+    # Se o usuário não for encontrado, retorne um erro
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+    
+    # Atualiza os campos do usuário com os dados enviados na requisição
+    data = request.json
+    user.first_name = data.get('first_name', user.first_name)
+    user.last_name = data.get('last_name', user.last_name)
+    user.username = data.get('username', user.username)
+    user.gender = data.get('gender', user.gender)
+    user.birth_date = data.get('birth_date', user.birth_date)
+    user.phone = data.get('phone', user.phone)
+    user.location = data.get('location', user.location)
+    
+    # Salva as alterações no banco de dados
+    db.session.commit()
+    
+    # Retorna uma mensagem de sucesso
+    return jsonify({"msg": "User information updated successfully"}), 200
+
 @api.route('/protected', methods=['GET'])
 @jwt_required
 def protected():
