@@ -4,6 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
 class User(db.Model):
+    __tablename__ = 'user'
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
@@ -15,10 +17,7 @@ class User(db.Model):
     phone = db.Column(db.String(120))
     location = db.Column(db.String(120))
 
-    def __repr__(self):
-        return f'<User {self.email}>'
-
-    def serialize(self):
+    def to_dict(self):
         return {
             "id": self.id,
             "email": self.email,
@@ -37,7 +36,10 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
 class Product(db.Model):
+    __tablename__ = 'product'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(120), nullable=False)
@@ -52,6 +54,19 @@ class Product(db.Model):
     category = db.relationship('ProductCategory')  # nova relação
     subcategory = db.relationship('ProductSubcategory')  # nova relação
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "name": self.name,
+            "description": self.description,
+            "category_id": self.category_id,
+            "subcategory_id": self.subcategory_id,
+            "condition": self.condition,
+            "estimated_value": self.estimated_value,
+            "location": self.location
+        }
+
 class ProductCategory(db.Model):
     __tablename__ = 'product_category'
     
@@ -65,8 +80,7 @@ class ProductCategory(db.Model):
             'name': self.name,
             'subcategories': [subcategory.to_dict() for subcategory in self.subcategories]
         }
-
-
+        
 class ProductSubcategory(db.Model):
     __tablename__ = 'product_subcategory'
     
@@ -83,6 +97,8 @@ class ProductSubcategory(db.Model):
 
 
 class Service(db.Model):
+    __tablename__ = 'service'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(120), nullable=False)
@@ -92,6 +108,17 @@ class Service(db.Model):
     location = db.Column(db.String(120))
 
     user = db.relationship('User', backref='services')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "name": self.name,
+            "description": self.description,
+            "category": self.category,
+            "estimated_value": self.estimated_value,
+            "location": self.location
+        }
 
 class ServiceCategory(db.Model):
     __tablename__ = 'service_categories'
@@ -120,9 +147,9 @@ class ServiceSubcategory(db.Model):
             "category_id": self.category_id
         }
 
-
-
 class Trade(db.Model):
+    __tablename__ = 'trade'
+
     id = db.Column(db.Integer, primary_key=True)
     offering_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     receiving_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -132,7 +159,22 @@ class Trade(db.Model):
     offered_service_id = db.Column(db.Integer, db.ForeignKey('service.id'))
     status = db.Column(db.String(30), nullable=False)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "offering_user_id": self.offering_user_id,
+            "receiving_user_id": self.receiving_user_id,
+            "product_id": self.product_id,
+            "service_id": self.service_id,
+            "offered_product_id": self.offered_product_id,
+            "offered_service_id": self.offered_service_id,
+            "status": self.status
+        }
+
+
 class Message(db.Model):
+    __tablename__ = 'message'
+
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -140,15 +182,46 @@ class Message(db.Model):
     service_id = db.Column(db.Integer, db.ForeignKey('service.id'))
     content = db.Column(db.Text, nullable=False)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "sender_id": self.sender_id,
+            "receiver_id": self.receiver_id,
+            "product_id": self.product_id,
+            "service_id": self.service_id,
+            "content": self.content
+        }
+
+
 class Wishlist(db.Model):
+    __tablename__ = 'wishlist'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     service_id = db.Column(db.Integer, db.ForeignKey('service.id'))
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "product_id": self.product_id,
+            "service_id": self.service_id
+        }
+
 
 class Favorite(db.Model):
+    __tablename__ = 'favorite'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     service_id = db.Column(db.Integer, db.ForeignKey('service.id'))
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "product_id": self.product_id,
+            "service_id": self.service_id
+        }
