@@ -30,7 +30,11 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"msg": "User created successfully"}), 201
+    # Criar um dicionário para representar o novo usuário
+    user_dict = new_user.to_dict()
+    
+    return jsonify({"msg": "User created successfully", "user": user_dict}), 201
+
 
 @api.route('/login', methods=['POST'])
 def login():
@@ -45,8 +49,10 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({"msg": "Bad username or password"}), 401
 
+    # removendo a senha do usuário
+    user_dict = user.to_dict()
     access_token = create_access_token(identity=email)
-    return jsonify(access_token=access_token)
+    return jsonify(access_token=access_token, user=user_dict)
 
 @api.route('/user/me', methods=['GET'])
 @jwt_required()
@@ -56,9 +62,7 @@ def get_user_info():
 
     if not user:
         return jsonify({"msg": "User not found"}), 404
-    # Retorna as informações do usuário como JSON
     return jsonify(user.to_dict()), 200
-
 
 @api.route('/user/me', methods=['PUT'])
 @jwt_required()
@@ -68,97 +72,126 @@ def update_user_info():
 
     if not user:
         return jsonify({"msg": "User not found"}), 404
-    
-    # Atualiza os campos do usuário com os dados enviados na requisição
-    data = request.json
-    user.first_name = data.get('first_name', user.first_name)
-    user.last_name = data.get('last_name', user.last_name)
-    user.username = data.get('username', user.username)
-    user.gender = data.get('gender', user.gender)
-    user.birth_date = data.get('birth_date', user.birth_date)
-    user.phone = data.get('phone', user.phone)
-    user.location = data.get('location', user.location)
-    
-    # Salva as alterações no banco de dados
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    for field in ["first_name", "last_name", "username"]:
+        if field in data:
+            setattr(user, field, data[field])
+        elif getattr(user, field) is None:  # check if field is required and not set
+            return jsonify({f"msg": f"Missing {field} parameter"}), 400
+
+    optional_fields = ["gender", "birth_date", "phone", "location"]
+    for field in optional_fields:
+        if field in data:
+            setattr(user, field, data[field])
+
     db.session.commit()
-    
-    # Retorna uma mensagem de sucesso
+
     return jsonify({"msg": "User information updated successfully"}), 200
 
+
 @api.route('/protected', methods=['GET'])
-@jwt_required
+@jwt_required()
 def protected():
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
+    current_user_email = get_jwt_identity()
+    current_user = User.query.filter_by(email=current_user_email).first()
+    return jsonify(logged_in_as=current_user.to_dict()), 200
+
 
 @api.route('/products', methods=['GET'])
 def get_products():
     products = Product.query.all()
-    return jsonify([product.serialize() for product in products])
+    return jsonify([product.to_dict() for product in products])
 
 @api.route('/products', methods=['POST'])
 @jwt_required()
 def create_product():
-    current_user = get_jwt_identity()
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
     data = request.get_json()
-    new_product = Product(user_id=current_user.id, 
+
+    if not data:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    required_fields = ["name", "description", "category", "condition"]
+    for field in required_fields:
+        if field not in data:
+            return jsonify({f"msg": f"Missing {field} parameter"}), 400
+
+    new_product = Product(user_id=user.id, 
                           name=data['name'], 
                           description=data['description'],
                           category=data['category'],
                           condition=data['condition'])
     db.session.add(new_product)
     db.session.commit()
-    return jsonify(new_product.serialize()), 201
+
+    return jsonify(new_product.to_dict()), 201
 
 @api.route('/services', methods=['GET'])
 def get_services():
     services = Service.query.all()
-    return jsonify([service.serialize() for service in services])
+    return jsonify([service.to_dict() for service in services])
 
 @api.route('/services', methods=['POST'])
-@jwt_required()
+@jwt_required
 def create_service():
-     # Adicionar um novo serviço
     current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
     data = request.get_json()
-    new_service = Service(user_id=current_user.id, 
+    if not all(field in data for field in ["name", "description", "category"]):
+        return jsonify({"msg": "Missing required field(s)"}), 400
+
+    new_service = Service(user_id=user.id, 
                           name=data['name'], 
                           description=data['description'],
                           category=data['category'])
     db.session.add(new_service)
     db.session.commit()
-    return jsonify(new_service.serialize()), 201
+    return jsonify(new_service.to_dict()), 201
+
 
 # Criar uma nova mensagem
 @api.route('/messages', methods=['POST'])
-@jwt_required()
 def create_message():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
     data = request.get_json()
 
     # Verificar se o remetente e o destinatário existem
-    sender = User.query.get(data['sender_id'])
-    receiver = User.query.get(data['receiver_id'])
+    receiver = User.query.get(data.get('receiver_id'))
 
-    if not sender or not receiver:
-        return {"error": "sender or receiver does not exist"}, 400
+    if not receiver:
+        return {"error": "Receiver does not exist"}, 400
 
     # Se a mensagem estiver associada a um produto ou serviço, verificar se eles existem
     product = Product.query.get(data.get('product_id')) if 'product_id' in data else None
     service = Service.query.get(data.get('service_id')) if 'service_id' in data else None
 
     if ('product_id' in data and not product) or ('service_id' in data and not service):
-        return {"error": "product or service does not exist"}, 400
+        return {"error": "Product or service does not exist"}, 400
 
     # Criar a mensagem
-    message = Message(sender_id=sender.id, receiver_id=receiver.id, text=data['text'], product=product, service=service)
+    message = Message(sender_id=user.id, receiver_id=receiver.id, text=data['text'], product=product, service=service)
     db.session.add(message)
     db.session.commit()
 
-    return {"message": "message created successfully"}, 201
+    return {"message": "Message created successfully"}, 201
 
 # Obter todas as mensagens de um usuário específico
 @api.route('/users/<int:user_id>/messages', methods=['GET'])
-@jwt_required()
 def get_user_messages(user_id):
     user = User.query.get(user_id)
 
@@ -172,7 +205,6 @@ def get_user_messages(user_id):
 
 # Obter uma mensagem específica
 @api.route('/messages/<int:message_id>', methods=['GET'])
-@jwt_required()
 def get_message(message_id):
     message = Message.query.get(message_id)
 
@@ -183,7 +215,6 @@ def get_message(message_id):
 
 # Atualizar uma mensagem
 @api.route('/messages/<int:message_id>', methods=['PUT'])
-@jwt_required()
 def update_message(message_id):
     data = request.get_json()
     message = Message.query.get(message_id)
@@ -201,7 +232,6 @@ def update_message(message_id):
 
 # Deletar uma mensagem
 @api.route('/messages/<int:message_id>', methods=['DELETE'])
-@jwt_required()
 def delete_message(message_id):
     message = Message.query.get(message_id)
 
@@ -215,7 +245,6 @@ def delete_message(message_id):
 
 # Criar um novo trade
 @api.route('/trades', methods=['POST'])
-@jwt_required()
 def create_trade():
     data = request.get_json()
 
@@ -238,7 +267,6 @@ def create_trade():
 
 # Obter todos os trades de um usuário específico
 @api.route('/users/<int:user_id>/trades', methods=['GET'])
-@jwt_required()
 def get_user_trades(user_id):
     user = User.query.get(user_id)
 
@@ -251,7 +279,6 @@ def get_user_trades(user_id):
 
 # Obter um trade específico
 @api.route('/trades/<int:trade_id>', methods=['GET'])
-@jwt_required()
 def get_trade(trade_id):
     trade = Trade.query.get(trade_id)
 
@@ -262,7 +289,6 @@ def get_trade(trade_id):
 
 # Atualizar um trade
 @api.route('/trades/<int:trade_id>', methods=['PUT'])
-@jwt_required()
 def update_trade(trade_id):
     data = request.get_json()
     trade = Trade.query.get(trade_id)
@@ -280,7 +306,6 @@ def update_trade(trade_id):
 
 # Deletar um trade
 @api.route('/trades/<int:trade_id>', methods=['DELETE'])
-@jwt_required()
 def delete_trade(trade_id):
     trade = Trade.query.get(trade_id)
 
@@ -294,7 +319,6 @@ def delete_trade(trade_id):
 
     # Criar uma nova wishlist
 @api.route('/users/<int:user_id>/wishlist', methods=['POST'])
-@jwt_required()
 def create_wishlist(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -308,7 +332,6 @@ def create_wishlist(user_id):
 
 # Obter a wishlist de um usuário
 @api.route('/users/<int:user_id>/wishlist', methods=['GET'])
-@jwt_required()
 def get_wishlist(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -322,7 +345,6 @@ def get_wishlist(user_id):
 
 # Adicionar um produto ou serviço aos favoritos de um usuário
 @api.route('/users/<int:user_id>/favorites', methods=['POST'])
-@jwt_required()
 def add_favorite(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -352,7 +374,6 @@ def add_favorite(user_id):
 
 # Obter os favoritos de um usuário
 @api.route('/users/<int:user_id>/favorites', methods=['GET'])
-@jwt_required()
 def get_favorites(user_id):
     user = User.query.get(user_id)
     if not user:
