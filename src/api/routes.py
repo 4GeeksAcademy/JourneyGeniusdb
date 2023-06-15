@@ -142,7 +142,7 @@ def get_services():
     return jsonify([service.to_dict() for service in services])
 
 @api.route('/services', methods=['POST'])
-@jwt_required
+@jwt_required()
 def create_service():
     current_user = get_jwt_identity()
     user = User.query.filter_by(email=current_user).first()
@@ -164,6 +164,7 @@ def create_service():
 
 # Criar uma nova mensagem
 @api.route('/messages', methods=['POST'])
+@jwt_required()
 def create_message():
     current_user = get_jwt_identity()
     user = User.query.filter_by(email=current_user).first()
@@ -196,7 +197,7 @@ def get_user_messages(user_id):
     user = User.query.get(user_id)
 
     if not user:
-        return {"error": "user not found"}, 404
+        return {"error": "User not found"}, 404
 
     sent_messages = [message.to_dict() for message in user.sent_messages]
     received_messages = [message.to_dict() for message in user.received_messages]
@@ -209,18 +210,27 @@ def get_message(message_id):
     message = Message.query.get(message_id)
 
     if not message:
-        return {"error": "message not found"}, 404
+        return {"error": "Message not found"}, 404
 
     return {"message": message.to_dict()}, 200
 
 # Atualizar uma mensagem
 @api.route('/messages/<int:message_id>', methods=['PUT'])
+@jwt_required()
 def update_message(message_id):
-    data = request.get_json()
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
     message = Message.query.get(message_id)
 
     if not message:
-        return {"error": "message not found"}, 404
+        return {"error": "Message not found"}, 404
+    
+    # Somente permitir que o remetente atualize a mensagem
+    if message.sender_id != user.id:
+        return {"error": "Permission denied"}, 403
+
+    data = request.get_json()
 
     # Atualizar o texto da mensagem
     if 'text' in data:
@@ -228,15 +238,23 @@ def update_message(message_id):
 
     db.session.commit()
 
-    return {"message": "message updated successfully"}, 200
+    return {"message": "Message updated successfully"}, 200
 
 # Deletar uma mensagem
 @api.route('/messages/<int:message_id>', methods=['DELETE'])
+@jwt_required()
 def delete_message(message_id):
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
     message = Message.query.get(message_id)
 
     if not message:
-        return {"error": "message not found"}, 404
+        return {"error": "Message not found"}, 404
+
+    # Somente permitir que o remetente ou o destinatário delete a mensagem
+    if message.sender_id != user.id and message.receiver_id != user.id:
+        return {"error": "Permission denied"}, 403
 
     db.session.delete(message)
     db.session.commit()
@@ -245,33 +263,38 @@ def delete_message(message_id):
 
 # Criar um novo trade
 @api.route('/trades', methods=['POST'])
+@jwt_required()
 def create_trade():
+    current_user = get_jwt_identity()
+    proposer = User.query.filter_by(email=current_user).first()
+
     data = request.get_json()
 
-    # Verificar se o proponente, produtos e serviços existem
-    proposer = User.query.get(data['proposer_id'])
+    # Verificar se os produtos e serviços existem
     product_offered = Product.query.get(data.get('product_offered_id')) if 'product_offered_id' in data else None
     service_offered = Service.query.get(data.get('service_offered_id')) if 'service_offered_id' in data else None
     product_requested = Product.query.get(data.get('product_requested_id')) if 'product_requested_id' in data else None
     service_requested = Service.query.get(data.get('service_requested_id')) if 'service_requested_id' in data else None
 
-    if not proposer or ('product_offered_id' in data and not product_offered) or ('service_offered_id' in data and not service_offered) or ('product_requested_id' in data and not product_requested) or ('service_requested_id' in data and not service_requested):
-        return {"error": "proposer, product or service does not exist"}, 400
+    if ('product_offered_id' in data and not product_offered) or ('service_offered_id' in data and not service_offered) or ('product_requested_id' in data and not product_requested) or ('service_requested_id' in data and not service_requested):
+        return {"error": "Product or service does not exist"}, 400
 
     # Criar o trade
     trade = Trade(proposer_id=proposer.id, product_offered=product_offered, service_offered=service_offered, product_requested=product_requested, service_requested=service_requested, status=data['status'])
     db.session.add(trade)
     db.session.commit()
 
-    return {"message": "trade created successfully"}, 201
+    return {"message": "Trade created successfully"}, 201
 
 # Obter todos os trades de um usuário específico
-@api.route('/users/<int:user_id>/trades', methods=['GET'])
-def get_user_trades(user_id):
-    user = User.query.get(user_id)
+@api.route('/users/trades', methods=['GET'])
+@jwt_required()
+def get_user_trades():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
 
     if not user:
-        return {"error": "user not found"}, 404
+        return {"error": "User not found"}, 404
 
     proposed_trades = [trade.to_dict() for trade in user.proposed_trades]
 
@@ -279,22 +302,31 @@ def get_user_trades(user_id):
 
 # Obter um trade específico
 @api.route('/trades/<int:trade_id>', methods=['GET'])
+@jwt_required()
 def get_trade(trade_id):
     trade = Trade.query.get(trade_id)
 
     if not trade:
-        return {"error": "trade not found"}, 404
+        return {"error": "Trade not found"}, 404
 
     return {"trade": trade.to_dict()}, 200
 
 # Atualizar um trade
 @api.route('/trades/<int:trade_id>', methods=['PUT'])
+@jwt_required()
 def update_trade(trade_id):
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
     data = request.get_json()
     trade = Trade.query.get(trade_id)
 
     if not trade:
-        return {"error": "trade not found"}, 404
+        return {"error": "Trade not found"}, 404
+
+    # Apenas o proponente pode atualizar o trade
+    if trade.proposer_id != user.id:
+        return {"error": "Unauthorized"}, 401
 
     # Atualizar o status do trade
     if 'status' in data:
@@ -302,38 +334,53 @@ def update_trade(trade_id):
 
     db.session.commit()
 
-    return {"message": "trade updated successfully"}, 200
+    return {"message": "Trade updated successfully"}, 200
 
 # Deletar um trade
 @api.route('/trades/<int:trade_id>', methods=['DELETE'])
+@jwt_required()
 def delete_trade(trade_id):
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
     trade = Trade.query.get(trade_id)
 
     if not trade:
-        return {"error": "trade not found"}, 404
+        return {"error": "Trade not found"}, 404
+
+    # Apenas o proponente pode deletar o trade
+    if trade.proposer_id != user.id:
+        return {"error": "Unauthorized"}, 401
 
     db.session.delete(trade)
     db.session.commit()
 
-    return {"message": "trade deleted successfully"}, 200
+    return {"message": "Trade deleted successfully"}, 200
 
-    # Criar uma nova wishlist
-@api.route('/users/<int:user_id>/wishlist', methods=['POST'])
-def create_wishlist(user_id):
-    user = User.query.get(user_id)
+
+# Criar uma nova wishlist
+@api.route('/users/wishlist', methods=['POST'])
+@jwt_required()
+def create_wishlist():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
     if not user:
         return {"error": "User not found"}, 404
 
-    wishlist = Wishlist(user_id=user_id)
+    wishlist = Wishlist(user_id=user.id)
     db.session.add(wishlist)
     db.session.commit()
 
     return {"message": "Wishlist created successfully"}, 201
 
 # Obter a wishlist de um usuário
-@api.route('/users/<int:user_id>/wishlist', methods=['GET'])
-def get_wishlist(user_id):
-    user = User.query.get(user_id)
+@api.route('/users/wishlist', methods=['GET'])
+@jwt_required()
+def get_wishlist():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
     if not user:
         return {"error": "User not found"}, 404
 
@@ -344,11 +391,11 @@ def get_wishlist(user_id):
     return {"wishlist": [item.to_dict() for item in wishlist.items]}, 200
 
 # Adicionar um produto ou serviço aos favoritos de um usuário
-@api.route('/users/<int:user_id>/favorites', methods=['POST'])
-def add_favorite(user_id):
-    user = User.query.get(user_id)
-    if not user:
-        return {"error": "User not found"}, 404
+@api.route('/users/favorites', methods=['POST'])
+@jwt_required()
+def add_favorite():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
 
     data = request.get_json()
     product_id = data.get('product_id')
@@ -358,12 +405,12 @@ def add_favorite(user_id):
         product = Product.query.get(product_id)
         if product is None:
             return {"error": "Product not found"}, 404
-        favorite = Favorite(user_id=user_id, product_id=product_id)
+        favorite = Favorite(user_id=user.id, product_id=product_id)
     elif service_id is not None:
         service = Service.query.get(service_id)
         if service is None:
             return {"error": "Service not found"}, 404
-        favorite = Favorite(user_id=user_id, service_id=service_id)
+        favorite = Favorite(user_id=user.id, service_id=service_id)
     else:
         return {"error": "Product or service id is required"}, 400
 
@@ -373,14 +420,18 @@ def add_favorite(user_id):
     return {"message": "Favorite added successfully"}, 201
 
 # Obter os favoritos de um usuário
-@api.route('/users/<int:user_id>/favorites', methods=['GET'])
-def get_favorites(user_id):
-    user = User.query.get(user_id)
+@api.route('/users/favorites', methods=['GET'])
+@jwt_required()
+def get_favorites():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
     if not user:
         return {"error": "User not found"}, 404
 
     favorites = user.favorites
     return {"favorites": [favorite.to_dict() for favorite in favorites]}, 200
+
 
 @api.route('/product-categories', methods=['GET'])
 def get_product_categories():
