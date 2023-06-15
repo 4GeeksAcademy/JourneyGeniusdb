@@ -51,8 +51,8 @@ class Product(db.Model):
     location = db.Column(db.String(120))
 
     user = db.relationship('User', backref='products')
-    category = db.relationship('ProductCategory')  # nova relação
-    subcategory = db.relationship('ProductSubcategory')  # nova relação
+    category = db.relationship('ProductCategory', backref='products')  # nova relação
+    subcategory = db.relationship('ProductSubcategory', backref='products')  # nova relação
 
     def to_dict(self):
         return {
@@ -103,11 +103,14 @@ class Service(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(120), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    category = db.Column(db.String(120), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('service_categories.id'))  # nova coluna
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('service_subcategories.id'))  # nova coluna
     estimated_value = db.Column(db.Float, nullable=False)
     location = db.Column(db.String(120))
 
     user = db.relationship('User', backref='services')
+    category = db.relationship('ServiceCategory', backref='services')  # nova relação
+    subcategory = db.relationship('ServiceSubcategory', backref='services')  # nova relação
 
     def to_dict(self):
         return {
@@ -115,7 +118,8 @@ class Service(db.Model):
             "user_id": self.user_id,
             "name": self.name,
             "description": self.description,
-            "category": self.category,
+            "category_id": self.category_id,
+            "subcategory_id": self.subcategory_id,
             "estimated_value": self.estimated_value,
             "location": self.location
         }
