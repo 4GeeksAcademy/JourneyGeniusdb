@@ -48,28 +48,24 @@ def login():
     access_token = create_access_token(identity=email)
     return jsonify(access_token=access_token)
 
-@api.route('/user', methods=['GET'])
+@api.route('/user/me', methods=['GET'])
 @jwt_required()
 def get_user_info():
-    # Obtém o email do token de acesso
     user_email = get_jwt_identity()
-    # Busca o usuário com base no email
     user = User.query.filter_by(email=user_email).first()
-    # Se o usuário não for encontrado, retorne um erro
+
     if not user:
         return jsonify({"msg": "User not found"}), 404
     # Retorna as informações do usuário como JSON
     return jsonify(user.to_dict()), 200
 
 
-@api.route('/user', methods=['PUT'])
+@api.route('/user/me', methods=['PUT'])
 @jwt_required()
 def update_user_info():
-    # Obtém o email do token de acesso
     user_email = get_jwt_identity()
-    # Busca o usuário com base no email
     user = User.query.filter_by(email=user_email).first()
-    # Se o usuário não for encontrado, retorne um erro
+
     if not user:
         return jsonify({"msg": "User not found"}), 404
     
@@ -101,6 +97,7 @@ def get_products():
     return jsonify([product.serialize() for product in products])
 
 @api.route('/products', methods=['POST'])
+@jwt_required()
 def create_product():
     current_user = get_jwt_identity()
     data = request.get_json()
@@ -119,6 +116,7 @@ def get_services():
     return jsonify([service.serialize() for service in services])
 
 @api.route('/services', methods=['POST'])
+@jwt_required()
 def create_service():
      # Adicionar um novo serviço
     current_user = get_jwt_identity()
@@ -133,6 +131,7 @@ def create_service():
 
 # Criar uma nova mensagem
 @api.route('/messages', methods=['POST'])
+@jwt_required()
 def create_message():
     data = request.get_json()
 
@@ -159,6 +158,7 @@ def create_message():
 
 # Obter todas as mensagens de um usuário específico
 @api.route('/users/<int:user_id>/messages', methods=['GET'])
+@jwt_required()
 def get_user_messages(user_id):
     user = User.query.get(user_id)
 
@@ -172,6 +172,7 @@ def get_user_messages(user_id):
 
 # Obter uma mensagem específica
 @api.route('/messages/<int:message_id>', methods=['GET'])
+@jwt_required()
 def get_message(message_id):
     message = Message.query.get(message_id)
 
@@ -182,6 +183,7 @@ def get_message(message_id):
 
 # Atualizar uma mensagem
 @api.route('/messages/<int:message_id>', methods=['PUT'])
+@jwt_required()
 def update_message(message_id):
     data = request.get_json()
     message = Message.query.get(message_id)
@@ -199,6 +201,7 @@ def update_message(message_id):
 
 # Deletar uma mensagem
 @api.route('/messages/<int:message_id>', methods=['DELETE'])
+@jwt_required()
 def delete_message(message_id):
     message = Message.query.get(message_id)
 
@@ -212,6 +215,7 @@ def delete_message(message_id):
 
 # Criar um novo trade
 @api.route('/trades', methods=['POST'])
+@jwt_required()
 def create_trade():
     data = request.get_json()
 
@@ -234,6 +238,7 @@ def create_trade():
 
 # Obter todos os trades de um usuário específico
 @api.route('/users/<int:user_id>/trades', methods=['GET'])
+@jwt_required()
 def get_user_trades(user_id):
     user = User.query.get(user_id)
 
@@ -246,6 +251,7 @@ def get_user_trades(user_id):
 
 # Obter um trade específico
 @api.route('/trades/<int:trade_id>', methods=['GET'])
+@jwt_required()
 def get_trade(trade_id):
     trade = Trade.query.get(trade_id)
 
@@ -256,6 +262,7 @@ def get_trade(trade_id):
 
 # Atualizar um trade
 @api.route('/trades/<int:trade_id>', methods=['PUT'])
+@jwt_required()
 def update_trade(trade_id):
     data = request.get_json()
     trade = Trade.query.get(trade_id)
@@ -273,6 +280,7 @@ def update_trade(trade_id):
 
 # Deletar um trade
 @api.route('/trades/<int:trade_id>', methods=['DELETE'])
+@jwt_required()
 def delete_trade(trade_id):
     trade = Trade.query.get(trade_id)
 
@@ -286,6 +294,7 @@ def delete_trade(trade_id):
 
     # Criar uma nova wishlist
 @api.route('/users/<int:user_id>/wishlist', methods=['POST'])
+@jwt_required()
 def create_wishlist(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -299,6 +308,7 @@ def create_wishlist(user_id):
 
 # Obter a wishlist de um usuário
 @api.route('/users/<int:user_id>/wishlist', methods=['GET'])
+@jwt_required()
 def get_wishlist(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -312,6 +322,7 @@ def get_wishlist(user_id):
 
 # Adicionar um produto ou serviço aos favoritos de um usuário
 @api.route('/users/<int:user_id>/favorites', methods=['POST'])
+@jwt_required()
 def add_favorite(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -341,6 +352,7 @@ def add_favorite(user_id):
 
 # Obter os favoritos de um usuário
 @api.route('/users/<int:user_id>/favorites', methods=['GET'])
+@jwt_required()
 def get_favorites(user_id):
     user = User.query.get(user_id)
     if not user:
