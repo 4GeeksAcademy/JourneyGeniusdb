@@ -126,11 +126,18 @@ def create_product():
         if field not in data:
             return jsonify({f"msg": f"Missing {field} parameter"}), 400
 
+    category = ProductCategory.query.get(data['category_id'])  # Busca a categoria pelo ID
+    subcategory = ProductSubcategory.query.get(data['subcategory_id'])  # Busca a subcategoria pelo ID
+    if not category or not subcategory:
+           return jsonify({"msg": "Category or Subcategory not found"}), 404
+
     new_product = Product(user_id=user.id, 
-                          name=data['name'], 
-                          description=data['description'],
-                          category=data['category'],
-                          condition=data['condition'])
+                      name=data['name'], 
+                      description=data['description'],
+                      category=category,  
+                      subcategory=subcategory,  
+                      condition=data['condition'],
+                      estimated_value=data['estimated_value'])
     db.session.add(new_product)
     db.session.commit()
 
