@@ -153,20 +153,37 @@ def get_services():
 def create_service():
     current_user = get_jwt_identity()
     user = User.query.filter_by(email=current_user).first()
+
     if not user:
         return jsonify({"msg": "User not found"}), 404
 
     data = request.get_json()
-    if not all(field in data for field in ["name", "description", "category"]):
-        return jsonify({"msg": "Missing required field(s)"}), 400
 
-    new_service = Service(user_id=user.id, 
-                          name=data['name'], 
-                          description=data['description'],
-                          category=data['category'])
+    required_fields = ["name", "description", "category_id", "subcategory_id", "estimated_value"]
+    for field in required_fields:
+        if field not in data:
+            return jsonify({f"msg": f"Missing {field} parameter"}), 400
+
+    category = ServiceCategory.query.get(data['category_id'])  # Busca a categoria pelo ID
+    subcategory = ServiceSubcategory.query.get(data['subcategory_id'])  # Busca a subcategoria pelo ID
+
+    if not category or not subcategory:
+        return jsonify({"msg": "Category or Subcategory not found"}), 404
+
+    new_service = Service(
+        user_id=user.id,
+        name=data['name'],
+        description=data['description'],
+        category=category,
+        subcategory=subcategory,
+        estimated_value=data['estimated_value'],
+        location=data.get('location')  # Adicionado como um campo opcional. Se não for fornecido, será None
+    )
     db.session.add(new_service)
     db.session.commit()
+
     return jsonify(new_service.to_dict()), 201
+
 
 
 # Criar uma nova mensagem
