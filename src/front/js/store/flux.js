@@ -49,8 +49,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ demo: demo });
             },
 
+            storeToken: (token) => {
+                localStorage.setItem('token', token);
+            },
+
             registerUser: (email, password) => {
-                fetch('/api/register', {
+                return fetch('/api/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -64,10 +68,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                 .then(data => {
                     if (data.msg) {
                         alert(data.msg);
+                        return true; // Indica sucesso
                     }
+                    return false; // Indica falha
                 })
                 .catch((error) => {
                     console.error('Error:', error);
+                    return false; // Indica falha
                 });
             }
         }

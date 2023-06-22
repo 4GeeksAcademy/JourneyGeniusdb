@@ -54,6 +54,16 @@ def login():
     access_token = create_access_token(identity=email)
     return jsonify(access_token=access_token, user=user_dict)
 
+@api.route('/profile', methods=['GET'])
+@jwt_required()
+def print_user_info():
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+    return jsonify(user.to_dict()), 200
+
 @api.route('/user/me', methods=['GET'])
 @jwt_required()
 def get_user_info():

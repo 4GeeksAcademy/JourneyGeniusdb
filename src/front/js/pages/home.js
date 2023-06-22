@@ -1,11 +1,13 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
+import { useNavigate } from 'react-router-dom';
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleRegister = () => {
         if (!validateEmail(email)) {
@@ -16,7 +18,12 @@ export const Home = () => {
             alert("Please insert a password.");
             return;
         }
-        actions.registerUser(email, password);
+        actions.registerUser(email, password)
+            .then(success => {
+                if (success) {
+                    navigate('/myinfo');
+                }
+            });
     };
 
     const validateEmail = email => {
