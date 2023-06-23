@@ -54,8 +54,9 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             registerUser: (email, password) => {
-                return fetch('/api/register', {
-                    method: 'POST',
+                const backendUrl = process.env.BACKEND_URL;
+                return fetch(`${backendUrl}/api/register`, {
+                    method: 'POST',                    
                     headers: {
                         'Content-Type': 'application/json'
                     },
