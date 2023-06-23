@@ -56,7 +56,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             registerUser: (email, password) => {
                 const backendUrl = process.env.BACKEND_URL;
                 return fetch(`${backendUrl}/api/register`, {
-                    method: 'POST',                    
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -67,9 +67,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.msg) {
-                        alert(data.msg);
+                    if (data.access_token) {
+                        // Armazenar o token de acesso na local storage
+                        localStorage.setItem('token', data.access_token);
                         return true; // Indica sucesso
+                    } else if (data.msg) {
+                        alert(data.msg);
                     }
                     return false; // Indica falha
                 })
@@ -78,6 +81,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false; // Indica falha
                 });
             }
+            
         }
     };
 };

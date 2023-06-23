@@ -30,10 +30,13 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
+    # Cria um token de acesso para o novo usuário logo após seu registro
+    access_token = create_access_token(identity=email)
+
     # Criar um dicionário para representar o novo usuário
     user_dict = new_user.to_dict()
     
-    return jsonify({"msg": "User created successfully", "user": user_dict}), 201
+    return jsonify({"msg": "User created successfully", "user": user_dict, "access_token": access_token}), 201
 
 
 @api.route('/login', methods=['POST'])

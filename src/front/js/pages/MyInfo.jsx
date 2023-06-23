@@ -34,8 +34,11 @@ const handleSubmit = (e) => {
       'Authorization': `Bearer ${token}`
   });
 
+  // URL base do backend
+  const backendUrl = process.env.BACKEND_URL;
+
   // Enviar uma solicitação PUT para atualizar as informações do usuário
-  fetch('/api/user/me', {
+  fetch(`${backendUrl}/api/user/me`, {
       method: 'PUT',
       headers: headers,
       body: JSON.stringify(userInfo)
