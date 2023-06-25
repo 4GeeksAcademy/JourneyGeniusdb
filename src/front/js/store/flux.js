@@ -2,7 +2,7 @@ const getState = ({ getStore, getActions, setStore }) => {
   return {
     store: {
       message: null,
-      isLoggedIn: false, // acompanha o estado de login
+      isLoggedIn: !!localStorage.getItem("token"), // Inicializa com base no token no localStorage
       demo: [
         {
           title: "FIRST",
@@ -124,6 +124,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             if (data.access_token) {
               // Armazenar o token de acesso na local storage
               localStorage.setItem("token", data.access_token);
+              // Atualizar o estado global para refletir que o usuário está logado
+              setStore({ isLoggedIn: true });
               return true; // Indica sucesso
             } else if (data.msg) {
               alert(data.msg);

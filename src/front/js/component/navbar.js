@@ -15,11 +15,14 @@ export const Navbar = () => {
     });
   };
 
+  // Decide o caminho com base no status de login
+  const logoPath = store.isLoggedIn ? "/profile" : "/";
+
   return (
     <nav className="navbar navbar-light bg-light">
       <div className="container">
-        {/* Link para Home */}
-        <Link to="/">
+        {/* Link para Home ou Perfil, dependendo se o usuário está logado */}
+        <Link to={logoPath}>
           <span className="navbar-brand mb-0 h1">Logo/Name</span>
         </Link>
 
