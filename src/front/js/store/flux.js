@@ -92,10 +92,14 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      // lógica para o logout
-      logoutUser: () => {
+      logoutUser: (onLogout) => {
         localStorage.removeItem("token");
         setStore({ isLoggedIn: false });
+
+        // Chama a função de callback onLogout
+        if (onLogout) {
+          onLogout();
+        }
       },
 
       // define o estado de login
