@@ -1,19 +1,45 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { Context } from "../store/appContext";
+import LoginModal from "./LoginModal.jsx"; 
 
 export const Navbar = () => {
-	return (
-		<nav className="navbar navbar-light bg-light">
-			<div className="container">
-				<Link to="/">
-					<span className="navbar-brand mb-0 h1">React Boilerplate</span>
-				</Link>
-				<div className="ml-auto">
-					<Link to="/demo">
-						<button className="btn btn-primary">Check the Context in action</button>
-					</Link>
-				</div>
-			</div>
-		</nav>
-	);
+    const { store, actions } = useContext(Context);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
+    const handleLogout = () => {
+        actions.logoutUser();
+    };
+
+    return (
+        <nav className="navbar navbar-light bg-light">
+            <div className="container">
+                {/* Link para Home */}
+                <Link to="/">
+                    <span className="navbar-brand mb-0 h1">Logo/Name</span>
+                </Link>
+
+                {/* Link para About */}
+                <Link to="/about" style={{ marginRight: 'auto' }}>
+                    About
+                </Link>
+
+                {/* Botão de Login/Logout */}
+                <div className="ml-auto">
+                    {!store.isLoggedIn ? (
+                        <button className="btn btn-primary" onClick={() => setShowLoginModal(true)}>
+                            Login
+                        </button>
+                    ) : (
+                        <button className="btn btn-primary" onClick={handleLogout}>
+                            Logout
+                        </button>
+                    )}
+                </div>
+
+                {/* Login Modal */}
+                <LoginModal show={showLoginModal} handleClose={() => setShowLoginModal(false)} />
+            </div>
+        </nav>
+    );
 };
