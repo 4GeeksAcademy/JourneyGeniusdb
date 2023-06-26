@@ -7,8 +7,7 @@ const AddProduct = () => {
   const [condition, setCondition] = useState("");
   const [estimatedValue, setEstimatedValue] = useState("");
   const [location, setLocation] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
+ 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
   const { store, actions } = useContext(Context);
@@ -16,14 +15,6 @@ const AddProduct = () => {
   useEffect(() => {
     actions.getCategories(); // Fetch categories
   }, []);
-
-  useEffect(() => {
-    console.log("Store subcategories changed:", store.subcategories);
-  }, [store.subcategories]);
-
-  useEffect(() => {
-    console.log("Subcategories in store:", store.subcategories);
-  }, [store.subcategories]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -36,19 +27,15 @@ const AddProduct = () => {
 
     if (categoryId) {
       actions.getSubcategories(categoryId);
-    } else {
-      setSubcategories([]);
-    }
+    } 
 
     setSelectedSubcategory(""); // Redefinir o valor selecionado para uma subcategoria vazia
   };
-  console.log(selectedCategory);
+  
 
   const filteredSubcategories = selectedCategory
     ? store.subcategories.filter((sub) => sub.category_id == selectedCategory)
     : [];
-
-  console.log(store.subcategories);
 
   return (
     <div>
