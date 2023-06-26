@@ -1,12 +1,26 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Sidebar from './Sidebar.jsx';
+import AddProduct from '../component/AddProducts.jsx';
 
 const Profile = () => {
+  // Estado para rastrear a opção de menu selecionada
+  const [selectedMenu, setSelectedMenu] = useState(null);
+
+  // Função para atualizar a opção de menu selecionada
+  const handleMenuSelection = (menu) => {
+    setSelectedMenu(menu);
+  };
+
   return (
     <div className="profile-container">
-     <Sidebar />
+      {/* Passa a função de callback para o componente Sidebar */}
+     <Sidebar onMenuSelect={handleMenuSelection}/>
+
       <div className="content-area">
-        {/* O conteúdo da área da direita será renderizado aqui */}
+        {/* Renderiza o componente AddProduct se 'Add a product' estiver selecionado */}
+        {selectedMenu === 'addProduct' && <AddProduct />}
+        
+        {/* Aqui iremos adicionando condições adicionais para outras opções de menu */}
       </div>
     </div>
   );

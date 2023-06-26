@@ -147,8 +147,8 @@ def create_product():
     new_product = Product(user_id=user.id, 
                       name=data['name'], 
                       description=data['description'],
-                      category=category,  
-                      subcategory=subcategory,  
+                      category_id=data['category'],  
+                      subcategory_id=data['subcategory'],    
                       condition=data['condition'],
                       estimated_value=data['estimated_value'])
     db.session.add(new_product)
@@ -477,7 +477,11 @@ def get_product_categories():
 
 @api.route('/product-subcategories', methods=['GET'])
 def get_product_subcategories():
-    subcategories = ProductSubcategory.query.all()
+    category_id = request.args.get('category_id')
+    if category_id:
+        subcategories = ProductSubcategory.query.filter_by(category_id=category_id).all()
+    else:
+        subcategories = ProductSubcategory.query.all()
     return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
 
 @api.route('/service-categories', methods=['GET'])
