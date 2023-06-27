@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import Sidebar from './Sidebar.jsx';
 import AddProduct from '../component/AddProducts.jsx';
+import AddService from '../component/AddService.jsx';
 
 const Profile = () => {
   // Estado para rastrear a opção de menu selecionada
@@ -18,9 +19,9 @@ const Profile = () => {
 
       <div className="content-area">
         {/* Renderiza o componente AddProduct se 'Add a product' estiver selecionado */}
-        {selectedMenu === 'addProduct' && <AddProduct />}
-        
+        {selectedMenu === 'addProduct' && <AddProduct />}        
         {/* Aqui iremos adicionando condições adicionais para outras opções de menu */}
+        {selectedMenu === 'addService' && <AddService />}
       </div>
     </div>
   );

@@ -9,9 +9,9 @@ const Sidebar = ({ onMenuSelect }) => {
       </div>
       <ul className="sidebar-menu">
          {/* Chama a função de callback ao clicar em uma opção de menu */}
-         <li onClick={() => onMenuSelect('addProduct')}>Add a product</li>
-        {/* Adicionaremos o evento onClick para as outras opções à medida que forem criadas */}
-        <li>Add a service</li>
+         <li onClick={() => onMenuSelect('addProduct')}>Add a product</li>        
+        <li onClick={() => onMenuSelect('addService')}>Add a service</li>
+        {/* Adicionar o evento onClick para as outras opções à medida que forem criadas */}
         <li>Your Products and Services</li>
         <li>Messages</li>
         <li>Trades</li>

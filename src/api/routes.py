@@ -192,21 +192,27 @@ def get_services():
 @api.route('/services', methods=['POST'])
 @jwt_required()
 def create_service():
-    current_user = get_jwt_identity()
-    user = User.query.filter_by(email=current_user).first()
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
 
     if not user:
         return jsonify({"msg": "User not found"}), 404
 
     data = request.get_json()
 
-    required_fields = ["name", "description", "category_id", "subcategory_id", "estimated_value"]
+    if not data:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    required_fields = ["name", "description", "category"]
     for field in required_fields:
         if field not in data:
-            return jsonify({f"msg": f"Missing {field} parameter"}), 400
+            return jsonify({"msg": f"Missing {field} parameter"}), 400
 
-    category = ServiceCategory.query.get(data['category_id'])  # Busca a categoria pelo ID
-    subcategory = ServiceSubcategory.query.get(data['subcategory_id'])  # Busca a subcategoria pelo ID
+    category_id = data['category']
+    subcategory_id = data['subcategory']
+
+    category = ServiceCategory.query.get(category_id)
+    subcategory = ServiceSubcategory.query.get(subcategory_id)
 
     if not category or not subcategory:
         return jsonify({"msg": "Category or Subcategory not found"}), 404
@@ -215,15 +221,17 @@ def create_service():
         user_id=user.id,
         name=data['name'],
         description=data['description'],
-        category=category,
-        subcategory=subcategory,
+        category_id=category.id,
+        subcategory_id=subcategory.id,
         estimated_value=data['estimated_value'],
-        location=data.get('location')  # Adicionado como um campo opcional. Se não for fornecido, será None
+        location=data['location']
     )
+
     db.session.add(new_service)
     db.session.commit()
 
     return jsonify(new_service.to_dict()), 201
+
 
 @api.route('/service-categories', methods=['GET'])
 def get_service_categories():
@@ -232,7 +240,16 @@ def get_service_categories():
 
 @api.route('/service-subcategories', methods=['GET'])
 def get_service_subcategories():
-    subcategories = ServiceSubcategory.query.all()
+    category_id = request.args.get('category_id')
+    if category_id:
+        subcategories = ServiceSubcategory.query.filter_by(category_id=category_id).all()
+    else:
+        subcategories = ServiceSubcategory.query.all()
+    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
+
+@api.route('/service-categories/<int:category_id>/subcategories', methods=['GET'])
+def get_service_subcategories_by_category(category_id):
+    subcategories = ServiceSubcategory.query.filter_by(category_id=category_id).all()
     return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
 
 # Criar uma nova mensagem

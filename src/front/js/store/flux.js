@@ -7,6 +7,8 @@ const getState = ({ getStore, getActions, setStore }) => {
       isLoggedIn: !!localStorage.getItem("token"), // Inicializa com base no token no localStorage
       categories: [],
       subcategories: [],
+      serviceCategories: [],
+      serviceSubcategories: [],
       demo: [
         {
           title: "FIRST",
@@ -138,6 +140,33 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
+      getServiceCategories: async function () {
+        try {
+          const response = await fetch(`${backendUrl}/api/service-categories`);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          const data = await response.json();
+          setStore({ serviceCategories: data });
+        } catch (error) {
+          console.error('Error fetching service categories:', error);
+        }
+      },
+      
+      getServiceSubcategories: async function (categoryId) {
+        try {
+          const response = await fetch(`${backendUrl}/api/service-subcategories?category_id=${categoryId}`);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          const data = await response.json();
+          console.log('Service subcategories data:', data);
+          setStore({ serviceSubcategories: data });
+        } catch (error) {
+          console.error('Error fetching service subcategories:', error);
+        }
+      },
+      
       registerUser: (email, password) => {
         const backendUrl = process.env.BACKEND_URL;
         return fetch(`${backendUrl}/api/register`, {
