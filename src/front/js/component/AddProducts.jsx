@@ -21,7 +21,7 @@ const AddProduct = () => {
       const authToken = localStorage.getItem("token");
 
       if (!authToken) {
-        console.error("Token de autenticação não encontrado");
+        console.error("Authentication Token not found");
         return;
       }
 
@@ -46,12 +46,12 @@ const AddProduct = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("Produto criado com sucesso:", data);
+        console.log("Product succesfully created:", data);
       } else {
-        console.error("Falha ao criar o produto:", data);
+        console.error("Failed creating product:", data);
       }
     } catch (error) {
-      console.error("Erro na requisição:", error);
+      console.error("Error in the request:", error);
     }
   };
 
