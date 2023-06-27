@@ -137,24 +137,52 @@ def create_product():
     required_fields = ["name", "description", "category", "condition"]
     for field in required_fields:
         if field not in data:
-            return jsonify({f"msg": f"Missing {field} parameter"}), 400
+            return jsonify({"msg": f"Missing {field} parameter"}), 400
 
-    category = ProductCategory.query.get(data['category_id'])  # Busca a categoria pelo ID
-    subcategory = ProductSubcategory.query.get(data['subcategory_id'])  # Busca a subcategoria pelo ID
+    category_id = data['category']
+    subcategory_id = data['subcategory']
+
+    category = ProductCategory.query.get(category_id)
+    subcategory = ProductSubcategory.query.get(subcategory_id)
+
     if not category or not subcategory:
-           return jsonify({"msg": "Category or Subcategory not found"}), 404
+        return jsonify({"msg": "Category or Subcategory not found"}), 404
 
-    new_product = Product(user_id=user.id, 
-                      name=data['name'], 
-                      description=data['description'],
-                      category_id=data['category'],  
-                      subcategory_id=data['subcategory'],    
-                      condition=data['condition'],
-                      estimated_value=data['estimated_value'])
+    new_product = Product(
+        user_id=user.id,
+        name=data['name'],
+        description=data['description'],
+        category_id=category.id,
+        subcategory_id=subcategory.id,
+        condition=data['condition'],
+        estimated_value=data['estimated_value'],
+        location=data['location']
+    )
+
     db.session.add(new_product)
     db.session.commit()
 
     return jsonify(new_product.to_dict()), 201
+
+
+@api.route('/product-categories', methods=['GET'])
+def get_product_categories():
+    categories = ProductCategory.query.all()
+    return jsonify([category.to_dict() for category in categories]), 200
+
+@api.route('/product-subcategories', methods=['GET'])
+def get_product_subcategories():
+    category_id = request.args.get('category_id')
+    if category_id:
+        subcategories = ProductSubcategory.query.filter_by(category_id=category_id).all()
+    else:
+        subcategories = ProductSubcategory.query.all()
+    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
+
+@api.route('/product-categories/<int:category_id>/subcategories', methods=['GET'])
+def get_product_subcategories_by_category(category_id):
+    subcategories = ProductSubcategory.query.filter_by(category_id=category_id).all()
+    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
 
 @api.route('/services', methods=['GET'])
 def get_services():
@@ -197,7 +225,15 @@ def create_service():
 
     return jsonify(new_service.to_dict()), 201
 
+@api.route('/service-categories', methods=['GET'])
+def get_service_categories():
+    categories = ServiceCategory.query.all()
+    return jsonify([category.to_dict() for category in categories]), 200
 
+@api.route('/service-subcategories', methods=['GET'])
+def get_service_subcategories():
+    subcategories = ServiceSubcategory.query.all()
+    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
 
 # Criar uma nova mensagem
 @api.route('/messages', methods=['POST'])
@@ -470,31 +506,4 @@ def get_favorites():
     return {"favorites": [favorite.to_dict() for favorite in favorites]}, 200
 
 
-@api.route('/product-categories', methods=['GET'])
-def get_product_categories():
-    categories = ProductCategory.query.all()
-    return jsonify([category.to_dict() for category in categories]), 200
 
-@api.route('/product-subcategories', methods=['GET'])
-def get_product_subcategories():
-    category_id = request.args.get('category_id')
-    if category_id:
-        subcategories = ProductSubcategory.query.filter_by(category_id=category_id).all()
-    else:
-        subcategories = ProductSubcategory.query.all()
-    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
-
-@api.route('/service-categories', methods=['GET'])
-def get_service_categories():
-    categories = ServiceCategory.query.all()
-    return jsonify([category.to_dict() for category in categories]), 200
-
-@api.route('/service-subcategories', methods=['GET'])
-def get_service_subcategories():
-    subcategories = ServiceSubcategory.query.all()
-    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
-
-@api.route('/product-categories/<int:category_id>/subcategories', methods=['GET'])
-def get_product_subcategories_by_category(category_id):
-    subcategories = ProductSubcategory.query.filter_by(category_id=category_id).all()
-    return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200

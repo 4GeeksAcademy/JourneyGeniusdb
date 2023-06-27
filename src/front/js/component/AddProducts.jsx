@@ -7,7 +7,6 @@ const AddProduct = () => {
   const [condition, setCondition] = useState("");
   const [estimatedValue, setEstimatedValue] = useState("");
   const [location, setLocation] = useState("");
- 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
   const { store, actions } = useContext(Context);
@@ -16,9 +15,49 @@ const AddProduct = () => {
     actions.getCategories(); // Fetch categories
   }, []);
 
+  const createNewProduct = async () => {
+    try {
+      const backendUrl = process.env.BACKEND_URL;
+      const authToken = localStorage.getItem("token");
+
+      if (!authToken) {
+        console.error("Token de autenticação não encontrado");
+        return;
+      }
+
+      // Fazendo uma chamada de API para autenticar o usuário
+      const response = await fetch(`${backendUrl}/api/products`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          name,
+          description,
+          category: selectedCategory,
+          subcategory: selectedSubcategory,
+          condition,
+          estimated_value: estimatedValue,
+          location,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Produto criado com sucesso:", data);
+      } else {
+        console.error("Falha ao criar o produto:", data);
+      }
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Requisição para enviar os dados do formulário para o backend.
+    createNewProduct();
   };
 
   const handleCategoryChange = async (event) => {
@@ -27,11 +66,10 @@ const AddProduct = () => {
 
     if (categoryId) {
       actions.getSubcategories(categoryId);
-    } 
+    }
 
-    setSelectedSubcategory(""); // Redefinir o valor selecionado para uma subcategoria vazia
+    setSelectedSubcategory("");
   };
-  
 
   const filteredSubcategories = selectedCategory
     ? store.subcategories.filter((sub) => sub.category_id == selectedCategory)
@@ -46,7 +84,35 @@ const AddProduct = () => {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        {/* Outros campos de input aqui */}
+
+        <input
+          type="text"
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Condition"
+          value={condition}
+          onChange={(e) => setCondition(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Estimated Value"
+          value={estimatedValue}
+          onChange={(e) => setEstimatedValue(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        />
+
         {/* Dropdown Menu for Categories */}
         <select name="category_id" onChange={handleCategoryChange}>
           <option value="">Select Category</option>
@@ -70,6 +136,7 @@ const AddProduct = () => {
             </option>
           ))}
         </select>
+
         <button type="submit">Add Product</button>
       </form>
     </div>
