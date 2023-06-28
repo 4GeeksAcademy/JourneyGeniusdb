@@ -9,6 +9,8 @@ const getState = ({ getStore, getActions, setStore }) => {
       subcategories: [],
       serviceCategories: [],
       serviceSubcategories: [],
+      products: [],
+      services: [],
       demo: [
         {
           title: "FIRST",
@@ -117,26 +119,28 @@ const getState = ({ getStore, getActions, setStore }) => {
         try {
           const response = await fetch(`${backendUrl}/api/product-categories`);
           if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
           }
           const data = await response.json();
           setStore({ categories: data });
         } catch (error) {
-          console.error('Error fetching categories:', error);
+          console.error("Error fetching categories:", error);
         }
       },
-    
+
       getSubcategories: async function (categoryId) {
         try {
-          const response = await fetch(`${backendUrl}/api/product-subcategories?category_id=${categoryId}`);
+          const response = await fetch(
+            `${backendUrl}/api/product-subcategories?category_id=${categoryId}`
+          );
           if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
           }
           const data = await response.json();
-          console.log('Subcategories data:', data);
-          setStore({subcategories: data});
+          console.log("Subcategories data:", data);
+          setStore({ subcategories: data });
         } catch (error) {
-          console.error('Error fetching subcategories:', error);
+          console.error("Error fetching subcategories:", error);
         }
       },
 
@@ -144,29 +148,70 @@ const getState = ({ getStore, getActions, setStore }) => {
         try {
           const response = await fetch(`${backendUrl}/api/service-categories`);
           if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
           }
           const data = await response.json();
           setStore({ serviceCategories: data });
         } catch (error) {
-          console.error('Error fetching service categories:', error);
+          console.error("Error fetching service categories:", error);
         }
       },
-      
+
       getServiceSubcategories: async function (categoryId) {
         try {
-          const response = await fetch(`${backendUrl}/api/service-subcategories?category_id=${categoryId}`);
+          const response = await fetch(
+            `${backendUrl}/api/service-subcategories?category_id=${categoryId}`
+          );
           if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
           }
           const data = await response.json();
-          console.log('Service subcategories data:', data);
+          console.log("Service subcategories data:", data);
           setStore({ serviceSubcategories: data });
         } catch (error) {
-          console.error('Error fetching service subcategories:', error);
+          console.error("Error fetching service subcategories:", error);
+        }
+      },
+
+      getUserItems: async function () {
+        try {
+          const backendUrl = process.env.BACKEND_URL;
+          const authToken = localStorage.getItem("token");
+      
+          if (!authToken) {
+            console.error("Authentication Token not found");
+            return;
+          }
+      
+          // Fazendo uma chamada de API para buscar os produtos e serviços do usuário
+          const responseProducts = await fetch(`${backendUrl}/api/products`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
+          const responseServices = await fetch(`${backendUrl}/api/services`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
+      
+          if (responseProducts.ok && responseServices.ok) {
+            const dataProducts = await responseProducts.json();
+            const dataServices = await responseServices.json();
+            // Atualizando o estado global com os produtos e serviços do usuário
+            setStore({
+              products: dataProducts,
+              services: dataServices,
+            });
+          } else {
+            console.error("Failed to fetch user items");
+          }
+        } catch (error) {
+          console.error("Error in the request:", error);
         }
       },
       
+
       registerUser: (email, password) => {
         const backendUrl = process.env.BACKEND_URL;
         return fetch(`${backendUrl}/api/register`, {

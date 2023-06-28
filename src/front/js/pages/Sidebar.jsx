@@ -1,5 +1,5 @@
-import React from 'react';
-import './Profile.css'; 
+import React from "react";
+import "./Profile.css";
 
 const Sidebar = ({ onMenuSelect }) => {
   return (
@@ -8,11 +8,11 @@ const Sidebar = ({ onMenuSelect }) => {
         {/* O espaço para a foto de perfil do usuário estará aqui */}
       </div>
       <ul className="sidebar-menu">
-         {/* Chama a função de callback ao clicar em uma opção de menu */}
-         <li onClick={() => onMenuSelect('addProduct')}>Add a product</li>        
-        <li onClick={() => onMenuSelect('addService')}>Add a service</li>
+        {/* Chama a função de callback ao clicar em uma opção de menu */}
+        <li onClick={() => onMenuSelect("addProduct")}>Add a product</li>
+        <li onClick={() => onMenuSelect("addService")}>Add a service</li>
+        <li onClick={() => onMenuSelect("userItems")}>Your Products and Services</li>
         {/* Adicionar o evento onClick para as outras opções à medida que forem criadas */}
-        <li>Your Products and Services</li>
         <li>Messages</li>
         <li>Trades</li>
         <li>Wishlist</li>
