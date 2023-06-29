@@ -9,8 +9,8 @@ const getState = ({ getStore, getActions, setStore }) => {
       subcategories: [],
       serviceCategories: [],
       serviceSubcategories: [],
-      products: [],
-      services: [],
+      
+
       demo: [
         {
           title: "FIRST",
@@ -173,43 +173,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      getUserItems: async function () {
-        try {
-          const backendUrl = process.env.BACKEND_URL;
-          const authToken = localStorage.getItem("token");
       
-          if (!authToken) {
-            console.error("Authentication Token not found");
-            return;
-          }
-      
-          // Fazendo uma chamada de API para buscar os produtos e serviços do usuário
-          const responseProducts = await fetch(`${backendUrl}/api/products`, {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          });
-          const responseServices = await fetch(`${backendUrl}/api/services`, {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          });
-      
-          if (responseProducts.ok && responseServices.ok) {
-            const dataProducts = await responseProducts.json();
-            const dataServices = await responseServices.json();
-            // Atualizando o estado global com os produtos e serviços do usuário
-            setStore({
-              products: dataProducts,
-              services: dataServices,
-            });
-          } else {
-            console.error("Failed to fetch user items");
-          }
-        } catch (error) {
-          console.error("Error in the request:", error);
-        }
-      },
       
 
       registerUser: (email, password) => {

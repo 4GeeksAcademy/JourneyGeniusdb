@@ -11,9 +11,9 @@ const Sidebar = ({ onMenuSelect }) => {
         {/* Chama a função de callback ao clicar em uma opção de menu */}
         <li onClick={() => onMenuSelect("addProduct")}>Add a product</li>
         <li onClick={() => onMenuSelect("addService")}>Add a service</li>
-        <li onClick={() => onMenuSelect("userItems")}>Your Products and Services</li>
+        
         {/* Adicionar o evento onClick para as outras opções à medida que forem criadas */}
-        <li>Messages</li>
+        
         <li>Trades</li>
         <li>Wishlist</li>
         <li>Favorites</li>
