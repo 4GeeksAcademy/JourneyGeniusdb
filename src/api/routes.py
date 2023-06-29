@@ -198,8 +198,20 @@ def get_product_subcategories_by_category(category_id):
 
 @api.route('/services', methods=['GET'])
 def get_services():
-    services = Service.query.all()
+    category_id = request.args.get('category_id')
+    subcategory_id = request.args.get('subcategory_id')
+    
+    query = Service.query
+    
+    if category_id:
+        query = query.filter_by(category_id=category_id)
+        
+    if subcategory_id:
+        query = query.filter_by(subcategory_id=subcategory_id)
+    
+    services = query.all()
     return jsonify([service.to_dict() for service in services])
+
 
 @api.route('/services', methods=['POST'])
 @jwt_required()

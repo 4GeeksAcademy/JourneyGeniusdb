@@ -3,6 +3,8 @@ import Sidebar from './Sidebar.jsx';
 import AddProduct from '../component/AddProducts.jsx';
 import AddService from '../component/AddService.jsx';
 import Search from '../component/Search.jsx';
+import SearchService from '../component/SearchService.jsx';
+
 
 
 const Profile = () => {
@@ -25,6 +27,8 @@ const Profile = () => {
         {/* Aqui iremos adicionando condições adicionais para outras opções de menu */}
         {selectedMenu === 'addService' && <AddService />}
         {selectedMenu === 'search' && <Search />}
+        {selectedMenu === 'searchService' && <SearchService />}
+        
       </div>
     </div>
   );

@@ -118,8 +118,8 @@ class Service(db.Model):
             "user_id": self.user_id,
             "name": self.name,
             "description": self.description,
-            "category_id": self.category_id,
-            "subcategory_id": self.subcategory_id,
+            "category": self.category.to_dict() if self.category else None,
+            "subcategory": self.subcategory.to_dict() if self.subcategory else None,
             "estimated_value": self.estimated_value,
             "location": self.location
         }

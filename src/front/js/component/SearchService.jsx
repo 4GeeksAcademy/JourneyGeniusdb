@@ -1,31 +1,31 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
 
-const Search = () => {
+const SearchService = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
   const { store, actions } = useContext(Context);
 
   useEffect(() => {
-    actions.getCategories(); // Fetch categories
+    actions.getServiceCategories(); // Fetch service categories
   }, []);
 
   const handleCategoryChange = (event) => {
     const categoryId = event.target.value;
     setSelectedCategory(categoryId);
     if (categoryId) {
-      actions.getSubcategories(categoryId);
+      actions.getServiceSubcategories(categoryId);
     }
     setSelectedSubcategory("");
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    actions.fetchProducts(selectedCategory, selectedSubcategory);
+    actions.fetchServices(selectedCategory, selectedSubcategory);
   };
 
   const filteredSubcategories = selectedCategory
-    ? store.subcategories.filter((sub) => sub.category_id == selectedCategory)
+    ? store.serviceSubcategories.filter((sub) => sub.category_id == selectedCategory)
     : [];
 
   return (
@@ -34,7 +34,7 @@ const Search = () => {
         {/* Dropdown Menu for Categories */}
         <select name="category_id" onChange={handleCategoryChange}>
           <option value="">Select Category</option>
-          {store.categories.map((category) => (
+          {store.serviceCategories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
             </option>
@@ -58,11 +58,11 @@ const Search = () => {
         <button type="submit">Search</button>
       </form>
 
-      {/* Renderizando a lista de produtos */}
+      {/* Renderizando a lista de serviços */}
       <ul>
-        {store.products.map((product) => (
-          <li key={product.id}>
-            {product.name} - {product.description}
+        {store.services.map((service) => (
+          <li key={service.id}>
+            {service.name} - {service.description}
           </li>
         ))}
       </ul>
@@ -70,4 +70,4 @@ const Search = () => {
   );
 };
 
-export default Search;
+export default SearchService;

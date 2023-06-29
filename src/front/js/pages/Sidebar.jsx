@@ -12,6 +12,7 @@ const Sidebar = ({ onMenuSelect }) => {
         <li onClick={() => onMenuSelect("addProduct")}>Add a product</li>
         <li onClick={() => onMenuSelect("addService")}>Add a service</li>
         <li onClick={() => onMenuSelect("search")}>Search</li>
+        <li onClick={() => onMenuSelect("searchService")}>Search Service</li>
         
         {/* Adicionar o evento onClick para as outras opções à medida que forem criadas */}
         

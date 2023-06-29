@@ -9,8 +9,8 @@ const getState = ({ getStore, getActions, setStore }) => {
       subcategories: [],
       serviceCategories: [],
       serviceSubcategories: [],
-      
-
+      products: [],
+      services: [],
       demo: [
         {
           title: "FIRST",
@@ -173,8 +173,65 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      
-      
+      fetchProducts: async function (categoryId, subcategoryId) {
+        try {
+          const backendUrl = process.env.BACKEND_URL;
+          let apiUrl = `${backendUrl}/api/products`;
+
+          if (categoryId || subcategoryId) {
+            apiUrl += "?";
+            if (categoryId) {
+              apiUrl += `category_id=${categoryId}`;
+            }
+            if (subcategoryId) {
+              apiUrl += categoryId
+                ? `&subcategory_id=${subcategoryId}`
+                : `subcategory_id=${subcategoryId}`;
+            }
+          }
+
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+
+          if (response.ok) {
+            setStore({ products: data });
+          } else {
+            console.error("Failed to fetch products:", data);
+          }
+        } catch (error) {
+          console.error("Error fetching products:", error);
+        }
+      },
+
+      fetchServices: async function (categoryId, subcategoryId) {
+        try {
+          const backendUrl = process.env.BACKEND_URL;
+          let apiUrl = `${backendUrl}/api/services`;
+
+          if (categoryId || subcategoryId) {
+            apiUrl += "?";
+            if (categoryId) {
+              apiUrl += `category_id=${categoryId}`;
+            }
+            if (subcategoryId) {
+              apiUrl += categoryId
+                ? `&subcategory_id=${subcategoryId}`
+                : `subcategory_id=${subcategoryId}`;
+            }
+          }
+
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+
+          if (response.ok) {
+            setStore({ services: data });
+          } else {
+            console.error("Failed to fetch services:", data);
+          }
+        } catch (error) {
+          console.error("Error fetching services:", error);
+        }
+      },
 
       registerUser: (email, password) => {
         const backendUrl = process.env.BACKEND_URL;
