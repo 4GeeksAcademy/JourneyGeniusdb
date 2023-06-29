@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import Sidebar from './Sidebar.jsx';
 import AddProduct from '../component/AddProducts.jsx';
 import AddService from '../component/AddService.jsx';
+import Search from '../component/Search.jsx';
 
 
 const Profile = () => {
@@ -23,7 +24,7 @@ const Profile = () => {
         {selectedMenu === 'addProduct' && <AddProduct />}        
         {/* Aqui iremos adicionando condições adicionais para outras opções de menu */}
         {selectedMenu === 'addService' && <AddService />}
-        
+        {selectedMenu === 'search' && <Search />}
       </div>
     </div>
   );

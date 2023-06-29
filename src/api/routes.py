@@ -117,8 +117,20 @@ def protected():
 
 @api.route('/products', methods=['GET'])
 def get_products():
-    products = Product.query.all()
+    category_id = request.args.get('category_id')
+    subcategory_id = request.args.get('subcategory_id')
+    
+    query = Product.query
+    
+    if category_id:
+        query = query.filter_by(category_id=category_id)
+        
+    if subcategory_id:
+        query = query.filter_by(subcategory_id=subcategory_id)
+    
+    products = query.all()
     return jsonify([product.to_dict() for product in products])
+
 
 @api.route('/products', methods=['POST'])
 @jwt_required()
