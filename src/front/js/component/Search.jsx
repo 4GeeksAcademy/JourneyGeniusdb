@@ -2,69 +2,109 @@ import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
 
 const Search = () => {
+  const [searchType, setSearchType] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
   const { store, actions } = useContext(Context);
 
   useEffect(() => {
-    actions.getCategories(); // Fetch categories
-  }, []);
+    if (searchType === "products") {
+      actions.getCategories(); // Fetch categories for products
+    } else if (searchType === "services") {
+      actions.getServiceCategories(); // Fetch categories for services
+    }
+  }, [searchType]);
 
   const handleCategoryChange = (event) => {
     const categoryId = event.target.value;
     setSelectedCategory(categoryId);
     if (categoryId) {
-      actions.getSubcategories(categoryId);
+      if (searchType === "products") {
+        actions.getSubcategories(categoryId); // Fetch subcategories for products
+      } else if (searchType === "services") {
+        actions.getServiceSubcategories(categoryId); // Fetch subcategories for services
+      }
     }
     setSelectedSubcategory("");
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    actions.fetchProducts(selectedCategory, selectedSubcategory);
+    if (searchType === "products") {
+      actions.fetchProducts(selectedCategory, selectedSubcategory);
+    } else if (searchType === "services") {
+      actions.fetchServices(selectedCategory, selectedSubcategory);
+    }
+  };
+
+  const handleSearchTypeChange = (newSearchType) => {
+    setSearchType(newSearchType);
+    setSelectedCategory("");
+    setSelectedSubcategory("");
   };
 
   const filteredSubcategories = selectedCategory
-    ? store.subcategories.filter((sub) => sub.category_id == selectedCategory)
+    ? (searchType === "products"
+        ? store.subcategories
+        : store.serviceSubcategories
+      ).filter((sub) => sub.category_id == selectedCategory)
     : [];
+
+  const categories = searchType === "products" ? store.categories : store.serviceCategories;
 
   return (
     <div>
-      <form onSubmit={handleSearch}>
-        {/* Dropdown Menu for Categories */}
-        <select name="category_id" onChange={handleCategoryChange}>
-          <option value="">Select Category</option>
-          {store.categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+      {/* Buttons to select between product or service search */}
+      <div>
+        <button onClick={() => handleSearchTypeChange("products")}>Buscar Produtos</button>
+        <button onClick={() => handleSearchTypeChange("services")}>Buscar Serviços</button>
+      </div>
 
-        {/* Dropdown Menu for Subcategories */}
-        <select
-          name="subcategory_id"
-          value={selectedSubcategory}
-          onChange={(e) => setSelectedSubcategory(e.target.value)}
-        >
-          <option value="">Select Subcategory</option>
-          {filteredSubcategories.map((subcategory) => (
-            <option key={subcategory.id} value={subcategory.id}>
-              {subcategory.name}
-            </option>
-          ))}
-        </select>
+      {/* Search form */}
+      {searchType && (
+        <form onSubmit={handleSearch}>
+          {/* Dropdown Menu for Categories */}
+          <select name="category_id" onChange={handleCategoryChange}>
+            <option value="">Select Category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
 
-        <button type="submit">Search</button>
-      </form>
+          {/* Dropdown Menu for Subcategories */}
+          <select
+            name="subcategory_id"
+            value={selectedSubcategory}
+            onChange={(e) => setSelectedSubcategory(e.target.value)}
+          >
+            <option value="">Select Subcategory</option>
+            {filteredSubcategories.map((subcategory) => (
+              <option key={subcategory.id} value={subcategory.id}>
+                {subcategory.name}
+              </option>
+            ))}
+          </select>
 
-      {/* Renderizando a lista de produtos */}
+          <button type="submit">Search</button>
+        </form>
+      )}
+
+      {/* Rendering the list of products or services */}
       <ul>
-        {store.products.map((product) => (
-          <li key={product.id}>
-            {product.name} - {product.description}
-          </li>
-        ))}
+        {searchType === "products" &&
+          store.products.map((product) => (
+            <li key={product.id}>
+              {product.name} - {product.description}
+            </li>
+          ))}
+        {searchType === "services" &&
+          store.services.map((service) => (
+            <li key={service.id}>
+              {service.name} - {service.description}
+            </li>
+          ))}
       </ul>
     </div>
   );
