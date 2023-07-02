@@ -237,24 +237,52 @@ const getState = ({ getStore, getActions, setStore }) => {
 
       fetchItemsByName: async function (searchTerm) {
         try {
-            const backendUrl = process.env.BACKEND_URL;
-            const apiUrl = `${backendUrl}/api/items/search?name=${searchTerm}`;
-    
-            const response = await fetch(apiUrl);
-            const data = await response.json();
+          const backendUrl = process.env.BACKEND_URL;
+          const apiUrl = `${backendUrl}/api/items/search?name=${searchTerm}`;
 
-            console.log("Data fetched:", data);
-    
-            if (response.ok) {
-                setStore({ searchedProducts: data.products, searchedServices: data.services });
-            } else {
-                console.error("Failed to fetch items by name:", data);
-            }
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+
+          console.log("Data fetched:", data);
+
+          if (response.ok) {
+            setStore({
+              searchedProducts: data.products,
+              searchedServices: data.services,
+            });
+          } else {
+            console.error("Failed to fetch items by name:", data);
+          }
         } catch (error) {
-            console.error("Error fetching items by name:", error);
+          console.error("Error fetching items by name:", error);
         }
-    },
-    
+      },
+
+      fetchUserItems: async function () {
+        try {
+          const token = localStorage.getItem("token");
+          const headers = new Headers({
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          });
+          const backendUrl = process.env.BACKEND_URL;
+          const apiUrl = `${backendUrl}/api/user/items`;
+
+          const response = await fetch(apiUrl, { headers: headers });
+          const data = await response.json();
+
+          if (response.ok) {
+            setStore({
+              userProducts: data.products,
+              userServices: data.services,
+            });
+          } else {
+            console.error("Failed to fetch user items:", data);
+          }
+        } catch (error) {
+          console.error("Error fetching user items:", error);
+        }
+      },
 
       registerUser: (email, password) => {
         const backendUrl = process.env.BACKEND_URL;

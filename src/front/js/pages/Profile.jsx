@@ -4,6 +4,7 @@ import AddProduct from '../component/AddProducts.jsx';
 import AddService from '../component/AddService.jsx';
 import Search from '../component/Search.jsx';
 import SearchService from '../component/SearchService.jsx';
+import UserItems from '../component/UserItems.jsx';
 
 
 
@@ -28,7 +29,7 @@ const Profile = () => {
         {selectedMenu === 'addService' && <AddService />}
         {selectedMenu === 'search' && <Search />}
         {selectedMenu === 'searchService' && <SearchService />}
-        
+        {selectedMenu === 'userItems' && <UserItems />}
       </div>
     </div>
   );

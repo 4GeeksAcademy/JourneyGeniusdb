@@ -295,6 +295,28 @@ def search_items():
     # Retorna um objeto JSON com ambos, produtos e serviços
     return jsonify({"products": products_list, "services": services_list})
 
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+@api.route('/user/items', methods=['GET'])
+@jwt_required()
+def get_user_items():
+    # Obtém o email do usuário a partir do token JWT.
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    # Buscando produtos e serviços cadastrados pelo usuário
+    products = Product.query.filter_by(user_id=user.id).all()
+    services = Service.query.filter_by(user_id=user.id).all()
+
+    # Convertendo produtos e serviços em dicionários
+    products_list = [product.to_dict() for product in products]
+    services_list = [service.to_dict() for service in services]
+
+    # Retornando um objeto JSON com produtos e serviços
+    return jsonify({"products": products_list, "services": services_list})
 
 
 # Criar uma nova mensagem
