@@ -59,7 +59,7 @@ const Search = () => {
     ? (searchType === "products"
         ? store.subcategories
         : store.serviceSubcategories
-      ).filter((sub) => sub.category_id === selectedCategory)
+      ).filter((sub) => sub.category_id == selectedCategory)
     : [];
 
   const categories =
