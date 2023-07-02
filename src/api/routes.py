@@ -296,6 +296,7 @@ def search_items():
     return jsonify({"products": products_list, "services": services_list})
 
 
+
 # Criar uma nova mensagem
 @api.route('/messages', methods=['POST'])
 @jwt_required()
@@ -567,19 +568,3 @@ def get_favorites():
     return {"favorites": [favorite.to_dict() for favorite in favorites]}, 200
 
 
-@api.route('/user/items', methods=['GET'])
-@jwt_required()
-def get_user_items():
-    user_email = get_jwt_identity()
-    user = User.query.filter_by(email=user_email).first()
-
-    if not user:
-        return jsonify({"msg": "User not found"}), 404
-
-    products = Product.query.filter_by(user_id=user.id).all()
-    services = Service.query.filter_by(user_id=user.id).all()
-
-    products_data = [product.to_dict() for product in products]
-    services_data = [service.to_dict() for service in services]
-
-    return jsonify({"products": products_data, "services": services_data}), 200
