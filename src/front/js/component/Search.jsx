@@ -5,6 +5,8 @@ const Search = () => {
   const [searchType, setSearchType] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const [specificSearch, setSpecificSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { store, actions } = useContext(Context);
 
   useEffect(() => {
@@ -30,7 +32,9 @@ const Search = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchType === "products") {
+    if (specificSearch) {
+      actions.fetchItemsByName(searchTerm); // Fetch specific item by name
+    } else if (searchType === "products") {
       actions.fetchProducts(selectedCategory, selectedSubcategory);
     } else if (searchType === "services") {
       actions.fetchServices(selectedCategory, selectedSubcategory);
@@ -41,27 +45,75 @@ const Search = () => {
     setSearchType(newSearchType);
     setSelectedCategory("");
     setSelectedSubcategory("");
+    setSpecificSearch(false);
+  };
+
+  const handleSpecificSearchToggle = () => {
+    setSpecificSearch(true);
+    setSearchType(null);
+    setSelectedCategory("");
+    setSelectedSubcategory("");
   };
 
   const filteredSubcategories = selectedCategory
     ? (searchType === "products"
         ? store.subcategories
         : store.serviceSubcategories
-      ).filter((sub) => sub.category_id == selectedCategory)
+      ).filter((sub) => sub.category_id === selectedCategory)
     : [];
 
-  const categories = searchType === "products" ? store.categories : store.serviceCategories;
+  const categories =
+    searchType === "products" ? store.categories : store.serviceCategories;
 
   return (
     <div>
-      {/* Buttons to select between product or service search */}
+      {/* Buttons to select between product, service or specific item search */}
       <div>
-        <button onClick={() => handleSearchTypeChange("products")}>Buscar Produtos</button>
-        <button onClick={() => handleSearchTypeChange("services")}>Buscar Serviços</button>
+        <button onClick={() => handleSearchTypeChange("products")}>
+          Search Products
+        </button>
+        <button onClick={() => handleSearchTypeChange("services")}>
+          Search Services
+        </button>
+        <button onClick={handleSpecificSearchToggle}>
+          Specific Item Search
+        </button>
       </div>
 
-      {/* Search form */}
-      {searchType && (
+      {specificSearch ? (
+        // Specific Item Search Input
+        <div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Enter item name..."
+          />
+          <button onClick={handleSearch}>Search</button>
+          {/* Renderizando os produtos pesquisados */}
+          {store.searchedProducts && (
+            <ul>
+              {store.searchedProducts.map((product) => (
+                <li key={product.id}>
+                  {product.name} - Product - {product.description}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Renderizando os serviços pesquisados */}
+          {store.searchedServices && (
+            <ul>
+              {store.searchedServices.map((service) => (
+                <li key={service.id}>
+                  {service.name} - Service - {service.description}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : searchType ? (
+        // Category and Subcategory Dropdowns
         <form onSubmit={handleSearch}>
           {/* Dropdown Menu for Categories */}
           <select name="category_id" onChange={handleCategoryChange}>
@@ -86,26 +138,27 @@ const Search = () => {
               </option>
             ))}
           </select>
-
           <button type="submit">Search</button>
         </form>
-      )}
+      ) : null}
 
       {/* Rendering the list of products or services */}
-      <ul>
-        {searchType === "products" &&
-          store.products.map((product) => (
-            <li key={product.id}>
-              {product.name} - {product.description}
-            </li>
-          ))}
-        {searchType === "services" &&
-          store.services.map((service) => (
-            <li key={service.id}>
-              {service.name} - {service.description}
-            </li>
-          ))}
-      </ul>
+      {!specificSearch && (
+        <ul>
+          {searchType === "products" &&
+            store.products.map((product) => (
+              <li key={product.id}>
+                {product.name} - {product.description}
+              </li>
+            ))}
+          {searchType === "services" &&
+            store.services.map((service) => (
+              <li key={service.id}>
+                {service.name} - {service.description}
+              </li>
+            ))}
+        </ul>
+      )}
     </div>
   );
 };

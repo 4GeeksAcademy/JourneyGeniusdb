@@ -276,6 +276,26 @@ def get_service_subcategories_by_category(category_id):
     subcategories = ServiceSubcategory.query.filter_by(category_id=category_id).all()
     return jsonify([subcategory.to_dict() for subcategory in subcategories]), 200
 
+@api.route('/items/search', methods=['GET'])
+def search_items():
+    name = request.args.get('name')
+    
+    if not name:
+        return jsonify({"msg": "Missing name parameter"}), 400
+    
+    # Busca de produtos por nome
+    products = Product.query.filter(Product.name.ilike(f'%{name}%')).all()
+    # Busca de serviços por nome
+    services = Service.query.filter(Service.name.ilike(f'%{name}%')).all()
+
+    # Converter os produtos e serviços em dicionários
+    products_list = [product.to_dict() for product in products]
+    services_list = [service.to_dict() for service in services]
+
+    # Retorna um objeto JSON com ambos, produtos e serviços
+    return jsonify({"products": products_list, "services": services_list})
+
+
 # Criar uma nova mensagem
 @api.route('/messages', methods=['POST'])
 @jwt_required()

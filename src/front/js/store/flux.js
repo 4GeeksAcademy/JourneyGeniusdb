@@ -11,6 +11,8 @@ const getState = ({ getStore, getActions, setStore }) => {
       serviceSubcategories: [],
       products: [],
       services: [],
+      searchedProducts: [],
+      searchedServices: [],
       demo: [
         {
           title: "FIRST",
@@ -232,6 +234,27 @@ const getState = ({ getStore, getActions, setStore }) => {
           console.error("Error fetching services:", error);
         }
       },
+
+      fetchItemsByName: async function (searchTerm) {
+        try {
+            const backendUrl = process.env.BACKEND_URL;
+            const apiUrl = `${backendUrl}/api/items/search?name=${searchTerm}`;
+    
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            console.log("Data fetched:", data);
+    
+            if (response.ok) {
+                setStore({ searchedProducts: data.products, searchedServices: data.services });
+            } else {
+                console.error("Failed to fetch items by name:", data);
+            }
+        } catch (error) {
+            console.error("Error fetching items by name:", error);
+        }
+    },
+    
 
       registerUser: (email, password) => {
         const backendUrl = process.env.BACKEND_URL;
