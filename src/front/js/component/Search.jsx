@@ -96,6 +96,9 @@ const Search = () => {
               {store.searchedProducts.map((product) => (
                 <li key={product.id}>
                   {product.name} - Product - {product.description}
+                  {product.user_id === store.loggedInUserId
+                    ? " (This item is yours)"
+                    : ""}
                 </li>
               ))}
             </ul>
@@ -107,6 +110,9 @@ const Search = () => {
               {store.searchedServices.map((service) => (
                 <li key={service.id}>
                   {service.name} - Service - {service.description}
+                  {service.user_id === store.loggedInUserId
+                    ? " (This service is yours)"
+                    : ""}
                 </li>
               ))}
             </ul>
