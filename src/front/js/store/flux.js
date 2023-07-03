@@ -60,6 +60,37 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ demo: demo });
       },
 
+      registerUser: (email, password) => {
+        const backendUrl = process.env.BACKEND_URL;
+        return fetch(`${backendUrl}/api/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.access_token) {
+              // Armazenar o token de acesso na local storage
+              localStorage.setItem("token", data.access_token);
+              // Atualizar o estado global para refletir que o usuário está logado
+              setStore({ isLoggedIn: true });
+              return true; // Indica sucesso
+            } else if (data.msg) {
+              alert(data.msg);
+            }
+            return false; // Indica falha
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            return false; // Indica falha
+          });
+      },
+
       storeToken: (token) => {
         localStorage.setItem("token", token);
       },
@@ -282,37 +313,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         } catch (error) {
           console.error("Error fetching user items:", error);
         }
-      },
-
-      registerUser: (email, password) => {
-        const backendUrl = process.env.BACKEND_URL;
-        return fetch(`${backendUrl}/api/register`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email,
-            password: password,
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.access_token) {
-              // Armazenar o token de acesso na local storage
-              localStorage.setItem("token", data.access_token);
-              // Atualizar o estado global para refletir que o usuário está logado
-              setStore({ isLoggedIn: true });
-              return true; // Indica sucesso
-            } else if (data.msg) {
-              alert(data.msg);
-            }
-            return false; // Indica falha
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            return false; // Indica falha
-          });
       },
     },
   };
