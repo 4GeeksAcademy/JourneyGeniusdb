@@ -295,8 +295,6 @@ def search_items():
     # Retorna um objeto JSON com ambos, produtos e serviços
     return jsonify({"products": products_list, "services": services_list})
 
-from flask_jwt_extended import jwt_required, get_jwt_identity
-
 @api.route('/user/items', methods=['GET'])
 @jwt_required()
 def get_user_items():
