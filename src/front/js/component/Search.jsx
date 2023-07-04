@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
+import ItemDetails from "./ItemDetails.jsx";
 
 const Search = () => {
   const [searchType, setSearchType] = useState(null);
@@ -8,6 +9,9 @@ const Search = () => {
   const [specificSearch, setSpecificSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { store, actions } = useContext(Context);
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItemType, setSelectedItemType] = useState(null);
 
   useEffect(() => {
     if (searchType === "products") {
@@ -67,17 +71,32 @@ const Search = () => {
   const categories =
     searchType === "products" ? store.categories : store.serviceCategories;
 
-  const renderItems = (items, isProduct) => (
-    <ul>
-      {items.map((item) => (
-        <li key={item.id}>
-          <strong>{item.name}</strong>
-          {isProduct && item.condition ? ` - Condition: ${item.condition}` : ""}
-          {item.estimated_value ? ` - Estimated Value: ${item.estimated_value}` : ""}
-        </li>
-      ))}
-    </ul>
-  );
+  const renderItems = (items, isProduct) => {
+    return items.map((item, index) => (
+      <div key={index} className="item-card">
+        <h3>{item.name}</h3>
+        {isProduct && <p>Condition: {item.condition}</p>}
+        <p>Estimated Value: ${item.estimated_value}</p>
+        <button
+          onClick={() =>
+            handleOpenDetails(item, isProduct ? "product" : "service")
+          }
+        >
+          Check details
+        </button>
+      </div>
+    ));
+  };
+
+  const handleOpenDetails = (item, itemType) => {
+    setSelectedItem(item);
+    setSelectedItemType(itemType);
+    setShowDetails(true);
+  };
+
+  const handleCloseDetails = () => {
+    setShowDetails(false);
+  };
 
   return (
     <div>
@@ -138,7 +157,16 @@ const Search = () => {
           {searchType === "services" && renderItems(store.services, false)}
         </div>
       )}
+      {/* Aqui é onde colocamos o trecho para renderizar o modal */}
+      {showDetails && selectedItem && selectedItemType && (
+        <ItemDetails
+          item={selectedItem}
+          itemType={selectedItemType}
+          onClose={handleCloseDetails}
+        />
+      )}
     </div>
+    
   );
 };
 
