@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+
 
 db = SQLAlchemy()
 
@@ -152,27 +154,38 @@ class ServiceSubcategory(db.Model):
         }
 
 class Trade(db.Model):
-    __tablename__ = 'trade'
+    __tablename__ = 'trades'
 
     id = db.Column(db.Integer, primary_key=True)
-    offering_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    receiving_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
-    service_id = db.Column(db.Integer, db.ForeignKey('service.id'))
-    offered_product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
-    offered_service_id = db.Column(db.Integer, db.ForeignKey('service.id'))
-    status = db.Column(db.String(30), nullable=False)
+    initiator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=True)
+    service_id = db.Column(db.Integer, db.ForeignKey('service.id'), nullable=True)
+    status = db.Column(db.String(120), nullable=False, default='pending')
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    initiator = db.relationship("User", foreign_keys=[initiator_id])
+    receiver = db.relationship("User", foreign_keys=[receiver_id])
+    product = db.relationship("Product")
+    service = db.relationship("Service")
+
+    def __init__(self, initiator_id, receiver_id, product_id=None, service_id=None):
+        self.initiator_id = initiator_id
+        self.receiver_id = receiver_id
+        self.product_id = product_id
+        self.service_id = service_id
 
     def to_dict(self):
         return {
             "id": self.id,
-            "offering_user_id": self.offering_user_id,
-            "receiving_user_id": self.receiving_user_id,
+            "initiator_id": self.initiator_id,
+            "receiver_id": self.receiver_id,
             "product_id": self.product_id,
             "service_id": self.service_id,
-            "offered_product_id": self.offered_product_id,
-            "offered_service_id": self.offered_service_id,
-            "status": self.status
+            "status": self.status,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
         }
 
 

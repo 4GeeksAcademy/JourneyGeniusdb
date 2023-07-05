@@ -323,6 +323,38 @@ const getState = ({ getStore, getActions, setStore }) => {
           console.error("Error fetching user items:", error);
         }
       },
+
+      createTrade: (productId, serviceId, message) => {
+        const store = getStore();
+        const backendUrl = process.env.BACKEND_URL;
+        const token = localStorage.getItem("token");
+
+        return fetch(`${backendUrl}/api/trades`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            product_id: productId,
+            service_id: serviceId,
+            message: message,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.id) {
+              // Negociação criada com sucesso
+              // Aqui eu vou atualizar o estado ou redirecionar o usuário
+            } else {
+              // Tratar erro na criação da negociação
+              console.error("Error creating trade:", data);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      },
     },
   };
 };

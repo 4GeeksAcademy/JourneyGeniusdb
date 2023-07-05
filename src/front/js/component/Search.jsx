@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
 import ItemDetails from "./ItemDetails.jsx";
+import TradeProposal from "./TradeProposal.jsx";
 
 const Search = () => {
   const [searchType, setSearchType] = useState(null);
@@ -12,6 +13,7 @@ const Search = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedItemType, setSelectedItemType] = useState(null);
+  const [showTradeProposal, setShowTradeProposal] = useState(false);
 
   useEffect(() => {
     if (searchType === "products") {
@@ -84,8 +86,23 @@ const Search = () => {
         >
           Check details
         </button>
+        {/* Abre o modal de Trade Proposal */}
+        <button onClick={() => handleOpenTradeProposal(item)}>
+          Propose Trade
+        </button>
       </div>
     ));
+  };
+
+  // Função para abrir o modal de TradeProposal
+  const handleOpenTradeProposal = (item) => {
+    setSelectedItem(item);
+    setShowTradeProposal(true);
+  };
+
+  // Função para fechar o modal de TradeProposal
+  const handleCloseTradeProposal = () => {
+    setShowTradeProposal(false);
   };
 
   const handleOpenDetails = (item, itemType) => {
@@ -165,8 +182,14 @@ const Search = () => {
           onClose={handleCloseDetails}
         />
       )}
+      {showTradeProposal && selectedItem && (
+        <TradeProposal
+          show={showTradeProposal}
+          handleClose={handleCloseTradeProposal}
+          itemToTrade={selectedItem}
+        />
+      )}
     </div>
-    
   );
 };
 
