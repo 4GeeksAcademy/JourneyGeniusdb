@@ -1,0 +1,271 @@
+[33mcommit 60a87ebfc1a06fa7d224d0103a4038793cc7bb12[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Wed Jul 5 16:31:49 2023 +0000
+
+    fixing issues trade
+
+[33mcommit f6259d30b4b548b6dc51a5cf979e127785ed6800[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Wed Jul 5 16:03:14 2023 +0000
+
+    working on the trades
+
+[33mcommit eb8a8b97824a63a60f00d7561208df2ac8b86b5d[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Tue Jul 4 08:27:07 2023 +0000
+
+    card details fully working
+
+[33mcommit 83a9345f85b97bdd20ac31fc04c0ef3141fdd956[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Mon Jul 3 22:46:03 2023 +0000
+
+    search melhorado
+
+[33mcommit a8cb84f6fd377629895441358dfb8a51cea21b73[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Mon Jul 3 18:22:27 2023 +0000
+
+    search fixed - logged user itens not showing
+
+[33mcommit a041d3b7a282da65205323318be0c93026f8cf0e[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Mon Jul 3 16:33:42 2023 +0000
+
+    nd
+
+[33mcommit 83573777634d2d1534e707b4840c5b4bc08a384e[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Mon Jul 3 10:00:29 2023 +0000
+
+    ...
+
+[33mcommit 5c1084c5824ef59f63b4716efee32e4d59ec6c57[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jul 2 19:37:06 2023 +0000
+
+    subcategories fixed
+
+[33mcommit f21b2a2118ab9dd90969d67262e78fd68214c1ec[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jul 2 18:49:13 2023 +0000
+
+    User items fully working
+
+[33mcommit e43596dd0d2a50f6a962675bf580d6be88604d2c[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jul 2 12:35:04 2023 +0000
+
+    user items del. from back end, needs restruc...
+
+[33mcommit 4bf4e23136d66d03dc56cb42b28feb92125e9bb1[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jul 2 12:17:34 2023 +0000
+
+    search per term added.
+
+[33mcommit 6db77c7e66e0fda510f03be836837d6ebf259b14[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jul 2 10:44:04 2023 +0000
+
+    search products and services together
+
+[33mcommit 498449b979bebac9dd28c8050fa0578949227dde[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Thu Jun 29 17:36:17 2023 +0000
+
+    Search Services fully working
+
+[33mcommit 641cd954db2411d313e5c9f9f5e49ee040189cad[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Thu Jun 29 10:21:21 2023 +0000
+
+    SearchProducts fully working
+
+[33mcommit 3f5e807882e703311d38ab2e8944dac697d0acd4[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Thu Jun 29 09:26:32 2023 +0000
+
+    deleting - restarting
+
+[33mcommit e697966b98ecb0cc8c0a858d4ecafdad8d0314e8[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Wed Jun 28 19:58:56 2023 +0000
+
+    UserItems retrieving data correctly
+
+[33mcommit a8f7dfae20afb0ffd2c37f7d26cd5c5df3879750[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Tue Jun 27 12:11:45 2023 +0000
+
+    AddService fully working
+
+[33mcommit cc434b0ea6544b3ca32d14822151904d4f402f4c[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Tue Jun 27 11:29:35 2023 +0000
+
+    pt to en
+
+[33mcommit bfa1a0dd998b3e9122b8dcc098257f9970ed5aff[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Tue Jun 27 11:04:02 2023 +0000
+
+    AddProduct fully working
+
+[33mcommit 51ae34e1a3d9a7e1486e2b040800bf8c597fd4ab[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Mon Jun 26 18:00:40 2023 +0000
+
+    cleaned AddProducts
+
+[33mcommit 48fec2a92071a194fda85948a5b3425fa04ebff1[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Mon Jun 26 17:55:43 2023 +0000
+
+    categories and subcategories of products
+
+[33mcommit 53b3b72722ae4cdf292455d5b4c3e15fd38efa73[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jun 25 18:50:34 2023 +0000
+
+    fixed minor issues + profile pagebuilding
+
+[33mcommit 5fb1e4d22b74d50a1487fcfd3408e27c6f7fc51c[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jun 25 16:40:14 2023 +0000
+
+    reg., login and out, myinfo, profile working
+
+[33mcommit b79f3663a2e46d3aca00f4b8573230b823825891[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jun 25 08:02:10 2023 +0000
+
+    login modal working and saving token
+
+[33mcommit 1196a0747bf7f6bc7eddfa851fa76615a403d149[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Fri Jun 23 20:40:22 2023 +0000
+
+    token kept after register+myinfo working
+
+[33mcommit fc8a1f6279fd551199c6a4379e9ea1a43c391b42[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Fri Jun 23 17:08:38 2023 +0000
+
+    registration working
+
+[33mcommit 08754c700fb0647a23df8291ce1fe4f84f16e545[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Thu Jun 22 18:02:37 2023 +0000
+
+    fixed registration and info pages + back logic
+
+[33mcommit 3e560409b527e73fdaccf4fb51d70cb9f56956d0[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Wed Jun 21 19:52:48 2023 +0000
+
+    Mais pages created
+
+[33mcommit 6abc5e97b9e8c7360e2f3a34a7154fa27b9ed6fa[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Wed Jun 21 18:46:58 2023 +0000
+
+    Landing page with register logic
+
+[33mcommit f4022f1cb40bb5662471284ee56e7e6cfb089d39[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jun 18 09:16:26 2023 +0000
+
+    Fixed service POST route, now working
+
+[33mcommit 1f39ce22260941e2efb432af127b62c0cc5cd19c[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sat Jun 17 19:56:59 2023 +0000
+
+    Rota de criação de produtos alterada e funcionando
+
+[33mcommit 1294417156b948abf11ef6e8526a93f79e81096e[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Thu Jun 15 18:10:56 2023 +0000
+
+    added backrefs to prod & serv + relation services
+
+[33mcommit 5471296f1f345712e1877877b854d6a25113bf34[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Thu Jun 15 17:16:39 2023 +0000
+
+    added more logic to the routes
+
+[33mcommit 9438fa6034b59c77e31a6bcd50bcd67d363223f6[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Thu Jun 15 15:08:13 2023 +0000
+
+    added more logic to the routes
+
+[33mcommit 79d7640bdc8ae37af9076cadaef4a190375ef436[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Thu Jun 15 13:23:55 2023 +0000
+
+    adjustments on routes
+
+[33mcommit 215c40d91846438ab65e0c2eed4dba9dcc87cbac[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Wed Jun 14 16:22:16 2023 +0000
+
+    added routes for user data
+
+[33mcommit f39a220366ae6ab7249a84c864dbfd534740a5a4[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Wed Jun 14 10:32:35 2023 +0000
+
+    all models serialized
+
+[33mcommit bd6aaf03474add834b1b9c2f96985e95b5a0bb86[m[33m ([m[1;31morigin/Tobi[m[33m, [m[1;31morigin/Rafael[m[33m)[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Tue Jun 13 17:17:27 2023 +0000
+
+    cat + sub routes, to dict in a few models
+
+[33mcommit 99b543f55ab255108942abc04af71768de2d66e6[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Tue Jun 13 16:10:49 2023 +0000
+
+    categories + subcategories populated
+
+[33mcommit f582ebdbb9587dd92297b368b51c590f30100c3c[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Tue Jun 13 02:51:07 2023 +0000
+
+    added products categories and subcategories
+
+[33mcommit a304e059596a99018977c00224da79708da948be[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Mon Jun 12 18:41:18 2023 +0000
+
+    Added routes to wishlist and favorites
+
+[33mcommit 1f90f19ffc0cb6316f3d66c6f454e45b4b436ac3[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Sun Jun 11 12:31:09 2023 +0000
+
+    adicionadas rotas e instâncias.
+
+[33mcommit cb834e09b8b1961fe19a6f9d88edff04cf9e6dc8[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Wed Jun 7 18:26:44 2023 +0000
+
+    + instancias em prod e serv., rotas post criadas
+
+[33mcommit efed1135c34f59b82da99fe7353d654991063cfd[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Tue Jun 6 17:15:41 2023 +0000
+
+    Novas tabelas criadas e adicionadas ao admin
+
+[33mcommit 18ca7d93969b6b44486e2fc29ffb73c592d5663f[m
+Author: rafalebre <rafaellebre100@gmail.com>
+Date:   Tue Jun 6 16:27:43 2023 +0000
+
+    JWT authent. e tabela user feitas, com rota. Td ok
+
+[33mcommit ee94ae23161
