@@ -3,7 +3,6 @@ import Sidebar from './Sidebar.jsx';
 import AddProduct from '../component/AddProducts.jsx';
 import AddService from '../component/AddService.jsx';
 import Search from '../component/Search.jsx';
-import SearchService from '../component/SearchService.jsx';
 import UserItems from '../component/UserItems.jsx';
 
 
@@ -21,14 +20,12 @@ const Profile = () => {
     <div className="profile-container">
       {/* Passa a função de callback para o componente Sidebar */}
      <Sidebar onMenuSelect={handleMenuSelection}/>
-
       <div className="content-area">
         {/* Renderiza o componente AddProduct se 'Add a product' estiver selecionado */}
         {selectedMenu === 'addProduct' && <AddProduct />}        
         {/* Aqui iremos adicionando condições adicionais para outras opções de menu */}
         {selectedMenu === 'addService' && <AddService />}
         {selectedMenu === 'search' && <Search />}
-        {selectedMenu === 'searchService' && <SearchService />}
         {selectedMenu === 'userItems' && <UserItems />}
       </div>
     </div>
