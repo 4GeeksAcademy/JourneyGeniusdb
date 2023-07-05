@@ -477,6 +477,103 @@ def delete_message(message_id):
 
     return {}, 204
 
+# Criar um novo trade
+@api.route('/trades', methods=['POST'])
+@jwt_required()
+def create_trade():
+    current_user = get_jwt_identity()
+    proposer = User.query.filter_by(email=current_user).first()
+
+    data = request.get_json()
+
+    # Verificar se os produtos e serviços existem
+    product_offered = Product.query.get(data.get('product_offered_id')) if 'product_offered_id' in data else None
+    service_offered = Service.query.get(data.get('service_offered_id')) if 'service_offered_id' in data else None
+    product_requested = Product.query.get(data.get('product_requested_id')) if 'product_requested_id' in data else None
+    service_requested = Service.query.get(data.get('service_requested_id')) if 'service_requested_id' in data else None
+
+    if ('product_offered_id' in data and not product_offered) or ('service_offered_id' in data and not service_offered) or ('product_requested_id' in data and not product_requested) or ('service_requested_id' in data and not service_requested):
+        return {"error": "Product or service does not exist"}, 400
+
+    # Criar o trade
+    trade = Trade(proposer_id=proposer.id, product_offered=product_offered, service_offered=service_offered, product_requested=product_requested, service_requested=service_requested, status=data['status'])
+    db.session.add(trade)
+    db.session.commit()
+
+    return {"message": "Trade created successfully"}, 201
+
+# Obter todos os trades de um usuário específico
+@api.route('/users/trades', methods=['GET'])
+@jwt_required()
+def get_user_trades():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
+    if not user:
+        return {"error": "User not found"}, 404
+
+    proposed_trades = [trade.to_dict() for trade in user.proposed_trades]
+
+    return {"proposed_trades": proposed_trades}, 200
+
+# Obter um trade específico
+@api.route('/trades/<int:trade_id>', methods=['GET'])
+@jwt_required()
+def get_trade(trade_id):
+    trade = Trade.query.get(trade_id)
+
+    if not trade:
+        return {"error": "Trade not found"}, 404
+
+    return {"trade": trade.to_dict()}, 200
+
+# Atualizar um trade
+@api.route('/trades/<int:trade_id>', methods=['PUT'])
+@jwt_required()
+def update_trade(trade_id):
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
+    data = request.get_json()
+    trade = Trade.query.get(trade_id)
+
+    if not trade:
+        return {"error": "Trade not found"}, 404
+
+    # Apenas o proponente pode atualizar o trade
+    if trade.proposer_id != user.id:
+        return {"error": "Unauthorized"}, 401
+
+    # Atualizar o status do trade
+    if 'status' in data:
+        trade.status = data['status']
+
+    db.session.commit()
+
+    return {"message": "Trade updated successfully"}, 200
+
+# Deletar um trade
+@api.route('/trades/<int:trade_id>', methods=['DELETE'])
+@jwt_required()
+def delete_trade(trade_id):
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
+    trade = Trade.query.get(trade_id)
+
+    if not trade:
+        return {"error": "Trade not found"}, 404
+
+    # Apenas o proponente pode deletar o trade
+    if trade.proposer_id != user.id:
+        return {"error": "Unauthorized"}, 401
+
+    db.session.delete(trade)
+    db.session.commit()
+
+    return {"message": "Trade deleted successfully"}, 200
+
+
 # Criar uma nova wishlist
 @api.route('/users/wishlist', methods=['POST'])
 @jwt_required()

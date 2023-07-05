@@ -211,20 +211,32 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      fetchProducts: async function () {
+      fetchProducts: async function (categoryId, subcategoryId) {
         try {
           const backendUrl = process.env.BACKEND_URL;
-          const apiUrl = `${backendUrl}/api/products`;
-
+          let apiUrl = `${backendUrl}/api/products`;
+      
+          if (categoryId || subcategoryId) {
+            apiUrl += "?";
+            if (categoryId) {
+              apiUrl += `category_id=${categoryId}`;
+            }
+            if (subcategoryId) {
+              apiUrl += categoryId
+                ? `&subcategory_id=${subcategoryId}`
+                : `subcategory_id=${subcategoryId}`;
+            }
+          }
+      
           const response = await fetch(apiUrl);
           const data = await response.json();
-
+      
           if (response.ok) {
             const store = getStore();
-            const loggedInUserId = parseInt(store.loggedInUserId, 10); // Garantindo que seja um número
+            const loggedInUserId = parseInt(store.loggedInUserId, 10);
             const filteredProducts = data.filter(
               (product) => parseInt(product.user_id, 10) !== loggedInUserId
-            ); // Convertendo para número antes de comparar
+            );
             setStore({ products: filteredProducts });
           } else {
             console.error("Failed to fetch products:", data);
@@ -233,6 +245,7 @@ const getState = ({ getStore, getActions, setStore }) => {
           console.error("Error fetching products:", error);
         }
       },
+      
 
       fetchServices: async function (categoryId, subcategoryId) {
         try {
