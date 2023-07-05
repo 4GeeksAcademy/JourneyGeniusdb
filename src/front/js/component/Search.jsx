@@ -37,42 +37,6 @@ const Search = () => {
     setSelectedSubcategory("");
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-
-    if (specificSearch) {
-      actions.fetchItemsByName(searchTerm);
-    } else if (searchType === "products") {
-      actions.fetchProducts(selectedCategory, selectedSubcategory);
-    } else if (searchType === "services") {
-      actions.fetchServices(selectedCategory, selectedSubcategory);
-    }
-  };
-
-  const handleSearchTypeChange = (newSearchType) => {
-    setSearchType(newSearchType);
-    setSelectedCategory("");
-    setSelectedSubcategory("");
-    setSpecificSearch(false);
-  };
-
-  const handleSpecificSearchToggle = () => {
-    setSpecificSearch(true);
-    setSearchType(null);
-    setSelectedCategory("");
-    setSelectedSubcategory("");
-  };
-
-  const filteredSubcategories = selectedCategory
-    ? (searchType === "products"
-        ? store.subcategories
-        : store.serviceSubcategories
-      ).filter((sub) => sub.category_id == selectedCategory)
-    : [];
-
-  const categories =
-    searchType === "products" ? store.categories : store.serviceCategories;
-
   const renderItems = (items, isProduct) => {
     return items.map((item, index) => (
       <div key={index} className="item-card">
@@ -115,6 +79,44 @@ const Search = () => {
     setShowDetails(false);
   };
 
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    if (specificSearch) {
+      actions.fetchItemsByName(searchTerm);
+    } else if (searchType === "products") {
+      actions.fetchProducts(selectedCategory, selectedSubcategory);
+    } else if (searchType === "services") {
+      actions.fetchServices(selectedCategory, selectedSubcategory);
+    }
+  };
+
+  const handleSearchTypeChange = (newSearchType) => {
+    setSearchType(newSearchType);
+    setSelectedCategory("");
+    setSelectedSubcategory("");
+    setSpecificSearch(false);
+  };
+
+  const handleSpecificSearchToggle = () => {
+    setSpecificSearch(true);
+    setSearchType(null);
+    setSelectedCategory("");
+    setSelectedSubcategory("");
+  };
+
+  const filteredSubcategories = selectedCategory
+    ? (searchType === "products"
+        ? store.subcategories
+        : store.serviceSubcategories
+      ).filter((sub) => sub.category_id == selectedCategory)
+    : [];
+
+  const categories =
+    searchType === "products" ? store.categories : store.serviceCategories;
+
+  
   return (
     <div>
       <div>

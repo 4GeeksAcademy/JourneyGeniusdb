@@ -324,36 +324,37 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      createTrade: (productId, serviceId, message) => {
+      createTrade: (productId, serviceId, message, receiverId) => {
         const store = getStore();
         const backendUrl = process.env.BACKEND_URL;
         const token = localStorage.getItem("token");
-
+    
         return fetch(`${backendUrl}/api/trades`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            product_id: productId,
-            service_id: serviceId,
-            message: message,
-          }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                service_id: serviceId,
+                message: message,
+                receiver_id: receiverId, // Inclua o receiver_id aqui
+            }),
         })
-          .then((response) => response.json())
-          .then((data) => {
+        .then((response) => response.json())
+        .then((data) => {
             if (data.id) {
-              // Negociação criada com sucesso
-              // Aqui eu vou atualizar o estado ou redirecionar o usuário
+                // Negociação criada com sucesso
+                // Aqui eu vou atualizar o estado ou redirecionar o usuário
             } else {
-              // Tratar erro na criação da negociação
-              console.error("Error creating trade:", data);
+                // Tratar erro na criação da negociação
+                console.error("Error creating trade:", data);
             }
-          })
-          .catch((error) => {
+        })
+        .catch((error) => {
             console.error("Error:", error);
-          });
+        });
       },
     },
   };

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { Modal, Button, Form } from "react-bootstrap";
 
@@ -7,9 +7,17 @@ const TradeProposal = ({ show, handleClose, itemToTrade }) => {
     const [selectedItem, setSelectedItem] = useState("");
     const [tradeMessage, setTradeMessage] = useState("");
 
+    // Quando o modal é aberto, buscar os itens do usuário
+    useEffect(() => {
+        if (show) {
+            actions.fetchUserItems();
+        }
+    }, [show, actions]);
+
     const handleTradeProposal = (e) => {
         e.preventDefault();
-        actions.createTrade(itemToTrade, selectedItem, tradeMessage);
+      
+        actions.createTrade(itemToTrade.id, selectedItem, tradeMessage, itemToTrade.owner_id);
         handleClose();
     };
 
@@ -35,6 +43,12 @@ const TradeProposal = ({ show, handleClose, itemToTrade }) => {
                                 store.userProducts.map((product) => (
                                     <option key={product.id} value={product.id}>
                                         {product.name} - Product
+                                    </option>
+                                ))}
+                            {store.userServices &&
+                                store.userServices.map((service) => (
+                                    <option key={service.id} value={service.id}>
+                                        {service.name} - Service
                                     </option>
                                 ))}
                         </select>
