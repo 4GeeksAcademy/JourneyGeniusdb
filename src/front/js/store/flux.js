@@ -13,6 +13,7 @@ const getState = ({ getStore, getActions, setStore }) => {
       services: [],
       searchedProducts: [],
       searchedServices: [],
+      userItems: [],
       demo: [
         {
           title: "FIRST",
@@ -215,7 +216,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         try {
           const backendUrl = process.env.BACKEND_URL;
           let apiUrl = `${backendUrl}/api/products`;
-      
+
           if (categoryId || subcategoryId) {
             apiUrl += "?";
             if (categoryId) {
@@ -227,10 +228,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 : `subcategory_id=${subcategoryId}`;
             }
           }
-      
+
           const response = await fetch(apiUrl);
           const data = await response.json();
-      
+
           if (response.ok) {
             const store = getStore();
             const loggedInUserId = parseInt(store.loggedInUserId, 10);
@@ -245,7 +246,6 @@ const getState = ({ getStore, getActions, setStore }) => {
           console.error("Error fetching products:", error);
         }
       },
-      
 
       fetchServices: async function (categoryId, subcategoryId) {
         try {
@@ -337,37 +337,106 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      createTrade: (productId, serviceId, message, receiverId) => {
-        const store = getStore();
-        const backendUrl = process.env.BACKEND_URL;
-        const token = localStorage.getItem("token");
-    
-        return fetch(`${backendUrl}/api/trades`, {
+      sendTradeProposal: async function (selectedItem, itemToTradeId, message) {
+        try {
+          const token = localStorage.getItem("token");
+          const headers = new Headers({
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          });
+          const backendUrl = process.env.BACKEND_URL;
+          const apiUrl = `${backendUrl}/api/trades`;
+      
+          const loggedInUserId = getStore().loggedInUserId;
+      
+          console.log("Sender ID:", loggedInUserId);
+          console.log("Receiver ID:", itemToTradeId);
+          console.log("Message:", message);
+          console.log("Selected Item:", selectedItem);
+      
+          const response = await fetch(apiUrl, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
+            headers: headers,
             body: JSON.stringify({
-                product_id: productId,
-                service_id: serviceId,
-                message: message,
-                receiver_id: receiverId, // Inclua o receiver_id aqui
+              sender_id: loggedInUserId,
+              receiver_id: itemToTradeId,
+              message: message,
+              item_id: selectedItem,
             }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.id) {
-                // Negociação criada com sucesso
-                // Aqui eu vou atualizar o estado ou redirecionar o usuário
-            } else {
-                // Tratar erro na criação da negociação
-                console.error("Error creating trade:", data);
-            }
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
+          });
+      
+          const data = await response.json();
+      
+          if (response.ok) {
+            // Lógica de tratamento para uma resposta de sucesso
+            console.log("Trade proposal sent successfully:", data);
+          } else {
+            // Lógica de tratamento para uma resposta com erro
+            console.log("Error sending trade proposal:", data);
+          }
+        } catch (error) {
+          // Lógica de tratamento de erros
+          console.error("Error sending trade proposal:", error);
+        }
+      },
+      
+      
+      handleAcceptProposal(proposalId) {
+        try {
+          const token = localStorage.getItem("token");
+          const headers = new Headers({
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          });
+          const backendUrl = process.env.BACKEND_URL;
+          const apiUrl = `${backendUrl}/api/trades/${proposalId}`;
+      
+          fetch(apiUrl, {
+            method: "PUT",
+            headers: headers,
+            body: JSON.stringify({
+              status: "Accepted",
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // Lógica de tratamento para uma resposta de sucesso
+            })
+            .catch((error) => {
+              // Lógica de tratamento para erros
+            });
+        } catch (error) {
+          // Lógica de tratamento de erros
+        }
+      },
+      
+      handleDeclineProposal(proposalId) {
+        try {
+          const token = localStorage.getItem("token");
+          const headers = new Headers({
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          });
+          const backendUrl = process.env.BACKEND_URL;
+          const apiUrl = `${backendUrl}/api/trades/${proposalId}`;
+      
+          fetch(apiUrl, {
+            method: "PUT",
+            headers: headers,
+            body: JSON.stringify({
+              status: "Declined",
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // Lógica de tratamento para uma resposta de sucesso
+            })
+            .catch((error) => {
+              // Lógica de tratamento para erros
+            });
+        } catch (error) {
+          // Lógica de tratamento de erros
+        }
       },
     },
   };

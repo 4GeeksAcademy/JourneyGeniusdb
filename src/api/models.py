@@ -154,39 +154,22 @@ class ServiceSubcategory(db.Model):
         }
 
 class Trade(db.Model):
-    __tablename__ = 'trades'
-
     id = db.Column(db.Integer, primary_key=True)
-    initiator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=True)
-    service_id = db.Column(db.Integer, db.ForeignKey('service.id'), nullable=True)
-    status = db.Column(db.String(120), nullable=False, default='pending')
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    sender_product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    receiver_product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    sender_service_id = db.Column(db.Integer, db.ForeignKey('service.id'), nullable=False)
+    receiver_service_id = db.Column(db.Integer, db.ForeignKey('service.id'), nullable=False)
+    message = db.Column(db.String(200), nullable=False)
+    status = db.Column(db.String(20), nullable=False)
 
-    initiator = db.relationship("User", foreign_keys=[initiator_id])
-    receiver = db.relationship("User", foreign_keys=[receiver_id])
-    product = db.relationship("Product")
-    service = db.relationship("Service")
-
-    def __init__(self, initiator_id, receiver_id, product_id=None, service_id=None):
-        self.initiator_id = initiator_id
-        self.receiver_id = receiver_id
-        self.product_id = product_id
-        self.service_id = service_id
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "initiator_id": self.initiator_id,
-            "receiver_id": self.receiver_id,
-            "product_id": self.product_id,
-            "service_id": self.service_id,
-            "status": self.status,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at
-        }
+    sender = db.relationship('User', foreign_keys=[sender_id])
+    receiver = db.relationship('User', foreign_keys=[receiver_id])
+    sender_product = db.relationship('Product', foreign_keys=[sender_product_id])
+    receiver_product = db.relationship('Product', foreign_keys=[receiver_product_id])
+    sender_service = db.relationship('Service', foreign_keys=[sender_service_id])
+    receiver_service = db.relationship('Service', foreign_keys=[receiver_service_id])
 
 
 class Message(db.Model):

@@ -184,7 +184,8 @@ const Search = () => {
           onClose={handleCloseDetails}
         />
       )}
-      {showTradeProposal && selectedItem && (
+      {/* Botão para abrir oTradeProposal */}
+      {selectedItem && (
         <TradeProposal
           show={showTradeProposal}
           handleClose={handleCloseTradeProposal}

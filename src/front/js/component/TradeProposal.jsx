@@ -1,81 +1,68 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Context } from "../store/appContext";
+import React, { useState, useContext } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import { Context } from "../store/appContext";
 
 const TradeProposal = ({ show, handleClose, itemToTrade }) => {
-    const { store, actions } = useContext(Context);
-    const [selectedItem, setSelectedItem] = useState("");
-    const [tradeMessage, setTradeMessage] = useState("");
+  const { store, actions } = useContext(Context);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [message, setMessage] = useState("");
 
-    // Quando o modal é aberto, buscar os itens do usuário
-    useEffect(() => {
-        if (show) {
-            actions.fetchUserItems();
-        }
-    }, [show, actions]);
+  const handleTradeProposal = (e) => {
+    e.preventDefault();
+    actions.sendTradeProposal(selectedItem, itemToTrade.id, message);
+    handleClose();
+  };
 
-    const handleTradeProposal = (e) => {
-        e.preventDefault();
-      
-        actions.createTrade(itemToTrade.id, selectedItem, tradeMessage, itemToTrade.owner_id);
-        handleClose();
-    };
-
-    return (
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Trade Proposal</Modal.Title>
-            </Modal.Header>
-            <Form onSubmit={handleTradeProposal}>
-                <Modal.Body>
-                    <div className="mb-3">
-                        <label htmlFor="item" className="form-label">
-                            Select your item for trade
-                        </label>
-                        <select
-                            className="form-control"
-                            id="item"
-                            value={selectedItem}
-                            onChange={(e) => setSelectedItem(e.target.value)}
-                        >
-                            <option value="">Select Item</option>
-                            {store.userProducts &&
-                                store.userProducts.map((product) => (
-                                    <option key={product.id} value={product.id}>
-                                        {product.name} - Product
-                                    </option>
-                                ))}
-                            {store.userServices &&
-                                store.userServices.map((service) => (
-                                    <option key={service.id} value={service.id}>
-                                        {service.name} - Service
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="message" className="form-label">
-                            Trade message (optional)
-                        </label>
-                        <textarea
-                            className="form-control"
-                            id="message"
-                            value={tradeMessage}
-                            onChange={(e) => setTradeMessage(e.target.value)}
-                        />
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" type="submit">
-                        Propose Trade
-                    </Button>
-                </Modal.Footer>
-            </Form>
-        </Modal>
-    );
+  return (
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Trade Proposal</Modal.Title>
+      </Modal.Header>
+      <Form onSubmit={handleTradeProposal}>
+        <Modal.Body>
+          <Form.Group controlId="selectedItem">
+            <Form.Label>Selected Item</Form.Label>
+            <Form.Control
+              as="select"
+              value={selectedItem}
+              onChange={(e) => setSelectedItem(e.target.value)}
+              required
+            >
+              <option value="">Select an item</option>
+              {store.userProducts.map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+              {store.userServices.map((service) => (
+                <option key={service.id} value={service.id}>
+                  {service.name}
+                </option>
+              ))}
+            </Form.Control>
+          </Form.Group>
+          <Form.Group controlId="message">
+            <Form.Label>Message</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" type="submit">
+            Send Proposal
+          </Button>
+        </Modal.Footer>
+      </Form>
+    </Modal>
+  );
 };
 
 export default TradeProposal;

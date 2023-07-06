@@ -316,6 +316,104 @@ def get_user_items():
     # Retornando um objeto JSON com produtos e serviços
     return jsonify({"products": products_list, "services": services_list})
 
+@api.route('/trades', methods=['POST'])
+@jwt_required()
+def create_trade():
+    sender_email = get_jwt_identity()
+    sender = User.query.filter_by(email=sender_email).first()
+
+    if not sender:
+        return jsonify({"msg": "User not found"}), 404
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    required_fields = ["receiver_id", "sender_product_id", "receiver_product_id", "sender_service_id", "receiver_service_id", "message"]
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"msg": f"Missing {field} parameter"}), 400
+
+    receiver_id = data['receiver_id']
+    receiver_product_id = data['receiver_product_id']
+    receiver_service_id = data['receiver_service_id']
+
+    receiver = User.query.get(receiver_id)
+    receiver_product = Product.query.get(receiver_product_id)
+    receiver_service = Service.query.get(receiver_service_id)
+
+    if not receiver or not receiver_product or not receiver_service:
+        return jsonify({"msg": "Receiver, Receiver Product, or Receiver Service not found"}), 404
+
+    new_trade = Trade(
+        sender_id=sender.id,
+        receiver_id=receiver.id,
+        sender_product_id=data['sender_product_id'],
+        receiver_product_id=receiver_product.id,
+        sender_service_id=data['sender_service_id'],
+        receiver_service_id=receiver_service.id,
+        message=data['message'],
+        status="Pending"
+    )
+
+    db.session.add(new_trade)
+    db.session.commit()
+
+    return jsonify(new_trade.to_dict()), 201
+
+
+@api.route('/trades', methods=['GET'])
+@jwt_required()
+def get_trades():
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    sent_trades = Trade.query.filter_by(sender_id=user.id).all()
+    received_trades = Trade.query.filter_by(receiver_id=user.id).all()
+
+    sent_trades_list = [trade.to_dict() for trade in sent_trades]
+    received_trades_list = [trade.to_dict() for trade in received_trades]
+
+    return jsonify({"sent_trades": sent_trades_list, "received_trades": received_trades_list}), 200
+
+
+@api.route('/trades/<int:trade_id>', methods=['PUT'])
+@jwt_required()
+def respond_to_trade(trade_id):
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    trade = Trade.query.get(trade_id)
+
+    if not trade:
+        return jsonify({"msg": "Trade not found"}), 404
+
+    if user.id != trade.receiver_id:
+        return jsonify({"msg": "Unauthorized"}), 401
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    if 'status' not in data:
+        return jsonify({"msg": "Missing 'status' parameter"}), 400
+
+    status = data['status']
+    if status not in ['Accepted', 'Declined']:
+        return jsonify({"msg": "Invalid status"}), 400
+
+    trade.status = status
+    db.session.commit()
+
+    return jsonify({"msg": "Trade status updated successfully"}), 200
 
 
 # Criar uma nova wishlist
