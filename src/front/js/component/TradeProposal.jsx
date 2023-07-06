@@ -29,12 +29,12 @@ const TradeProposal = ({ show, handleClose, itemToTrade }) => {
               required
             >
               <option value="">Select an item</option>
-              {store.userProducts.map((product) => (
+              {store.userProducts && store.userProducts.map((product) => (
                 <option key={product.id} value={product.id}>
                   {product.name}
                 </option>
               ))}
-              {store.userServices.map((service) => (
+              {store.userServices && store.userServices.map((service) => (
                 <option key={service.id} value={service.id}>
                   {service.name}
                 </option>

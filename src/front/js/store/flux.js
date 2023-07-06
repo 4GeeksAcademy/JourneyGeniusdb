@@ -337,7 +337,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      sendTradeProposal: async function (selectedItem, itemToTradeId, message) {
+      sendTradeProposal: async function (selectedItem, receiverId, itemToTradeId, message) {
         try {
           const token = localStorage.getItem("token");
           const headers = new Headers({
@@ -347,39 +347,35 @@ const getState = ({ getStore, getActions, setStore }) => {
           const backendUrl = process.env.BACKEND_URL;
           const apiUrl = `${backendUrl}/api/trades`;
       
-          const loggedInUserId = getStore().loggedInUserId;
-      
-          console.log("Sender ID:", loggedInUserId);
-          console.log("Receiver ID:", itemToTradeId);
+          console.log("Sender Item ID:", selectedItem);
+          console.log("Receiver ID:", receiverId);
+          console.log("Receiver Item ID:", itemToTradeId);
           console.log("Message:", message);
-          console.log("Selected Item:", selectedItem);
+          console.log("itemToTrade:", itemToTrade);
+
       
           const response = await fetch(apiUrl, {
             method: "POST",
             headers: headers,
             body: JSON.stringify({
-              sender_id: loggedInUserId,
-              receiver_id: itemToTradeId,
+              receiver_id: receiverId,
+              sender_product_id: selectedItem,
+              receiver_product_id: itemToTradeId,
               message: message,
-              item_id: selectedItem,
             }),
           });
       
           const data = await response.json();
       
           if (response.ok) {
-            // Lógica de tratamento para uma resposta de sucesso
             console.log("Trade proposal sent successfully:", data);
           } else {
-            // Lógica de tratamento para uma resposta com erro
             console.log("Error sending trade proposal:", data);
           }
         } catch (error) {
-          // Lógica de tratamento de erros
           console.error("Error sending trade proposal:", error);
         }
       },
-      
       
       handleAcceptProposal(proposalId) {
         try {
@@ -400,13 +396,10 @@ const getState = ({ getStore, getActions, setStore }) => {
           })
             .then((response) => response.json())
             .then((data) => {
-              // Lógica de tratamento para uma resposta de sucesso
             })
             .catch((error) => {
-              // Lógica de tratamento para erros
             });
         } catch (error) {
-          // Lógica de tratamento de erros
         }
       },
       
