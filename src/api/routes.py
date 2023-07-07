@@ -330,37 +330,44 @@ def create_trade():
     if not data:
         return jsonify({"msg": "Missing JSON in request"}), 400
 
-     # Verificar se pelo menos um produto ou serviço é enviado para cada lado da troca
+    # Verificar se pelo menos um produto ou serviço é enviado para cada lado da troca
     sender_has_item = 'sender_product_id' in data or 'sender_service_id' in data
     receiver_has_item = 'receiver_product_id' in data or 'receiver_service_id' in data
 
     if not (sender_has_item and receiver_has_item):
         return jsonify({"msg": "Sender and receiver must have at least one item (product or service)"}), 400
 
-    required_fields = ["receiver_id", "sender_product_id", "receiver_product_id", "sender_service_id", "receiver_service_id", "message"]
-    for field in required_fields:
-        if field not in data:
-            return jsonify({"msg": f"Missing {field} parameter"}), 400
-
-    receiver_id = data['receiver_id']
-    receiver_product_id = data['receiver_product_id']
-    receiver_service_id = data['receiver_service_id']
+    receiver_id = data.get('receiver_id')
+    receiver_product_id = data.get('receiver_product_id')
+    receiver_service_id = data.get('receiver_service_id')
 
     receiver = User.query.get(receiver_id)
-    receiver_product = Product.query.get(receiver_product_id)
-    receiver_service = Service.query.get(receiver_service_id)
+    
+    if not receiver:
+        return jsonify({"msg": "Receiver not found"}), 404
 
-    if not receiver or not receiver_product or not receiver_service:
-        return jsonify({"msg": "Receiver, Receiver Product, or Receiver Service not found"}), 404
+    if receiver_product_id:
+        receiver_product = Product.query.get(receiver_product_id)
+        if not receiver_product:
+            return jsonify({"msg": "Receiver Product not found"}), 404
+    else:
+        receiver_product_id = None
+
+    if receiver_service_id:
+        receiver_service = Service.query.get(receiver_service_id)
+        if not receiver_service:
+            return jsonify({"msg": "Receiver Service not found"}), 404
+    else:
+        receiver_service_id = None
 
     new_trade = Trade(
         sender_id=sender.id,
         receiver_id=receiver.id,
-        sender_product_id=data['sender_product_id'],
-        receiver_product_id=receiver_product.id,
-        sender_service_id=data['sender_service_id'],
-        receiver_service_id=receiver_service.id,
-        message=data['message'],
+        sender_product_id=data.get('sender_product_id'),
+        receiver_product_id=receiver_product_id,
+        sender_service_id=data.get('sender_service_id'),
+        receiver_service_id=receiver_service_id,
+        message=data.get('message'),
         status="Pending"
     )
 
@@ -368,6 +375,7 @@ def create_trade():
     db.session.commit()
 
     return jsonify(new_trade.to_dict()), 201
+
 
 
 @api.route('/trades', methods=['GET'])

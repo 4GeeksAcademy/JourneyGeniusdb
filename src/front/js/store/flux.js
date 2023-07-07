@@ -339,50 +339,57 @@ const getState = ({ getStore, getActions, setStore }) => {
 
       sendTradeProposal: async function (senderItem, receiverId, receiverItem, message, isSenderItemProduct = true, isReceiverItemProduct = true) {
         try {
-          const token = localStorage.getItem("token");
-          const headers = new Headers({
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          });
-          const backendUrl = process.env.BACKEND_URL;
-          const apiUrl = `${backendUrl}/api/trades`;
+            const token = localStorage.getItem("token");
+            const headers = new Headers({
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            });
+            const backendUrl = process.env.BACKEND_URL;
+            const apiUrl = `${backendUrl}/api/trades`;
     
-          const requestBody = {
-            receiver_id: receiverId,
-            message: message,
-          };
+            const requestBody = {
+                receiver_id: receiverId,
+                message: message,
+            };
     
-          if (isSenderItemProduct) {
-            requestBody.sender_product_id = senderItem;
-          } else {
-            requestBody.sender_service_id = senderItem;
-          }
+            if (isSenderItemProduct) {
+                requestBody.sender_product_id = senderItem;
+            } else {
+                requestBody.sender_service_id = senderItem;
+            }
     
-          if (isReceiverItemProduct) {
-            requestBody.receiver_product_id = receiverItem;
-          } else {
-            requestBody.receiver_service_id = receiverItem;
-          }
+            if (isReceiverItemProduct) {
+                requestBody.receiver_product_id = receiverItem;
+            } else {
+                requestBody.receiver_service_id = receiverItem;
+            }
     
-          console.log("Request Body:", requestBody);
+            console.log("Request Body:", requestBody);
     
-          const response = await fetch(apiUrl, {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify(requestBody),
-          });
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(requestBody),
+            });
     
-          const data = await response.json();
+            const textResponse = await response.text();
     
-          if (response.ok) {
-            console.log("Trade proposal sent successfully:", data);
-          } else {
-            console.log("Error sending trade proposal:", data);
-          }
+            try {
+                const data = JSON.parse(textResponse);
+                if (response.ok) {
+                    console.log("Trade proposal sent successfully:", data);
+                } else {
+                    console.log("Error sending trade proposal:", data);
+                }
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+                console.log("Server response:", textResponse);
+            }
         } catch (error) {
-          console.error("Error sending trade proposal:", error);
+            console.error("Error sending trade proposal:", error);
         }
     },
+    
     
       
       
