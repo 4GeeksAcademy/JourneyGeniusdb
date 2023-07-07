@@ -352,7 +352,6 @@ const getState = ({ getStore, getActions, setStore }) => {
           console.log("Receiver Item ID:", itemToTradeId);
           console.log("Message:", message);
           console.log("itemToTrade:", itemToTrade);
-
       
           const response = await fetch(apiUrl, {
             method: "POST",

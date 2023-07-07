@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { Context } from "../store/appContext";
 
@@ -6,6 +6,11 @@ const TradeProposal = ({ show, handleClose, itemToTrade }) => {
   const { store, actions } = useContext(Context);
   const [selectedItem, setSelectedItem] = useState("");
   const [message, setMessage] = useState("");
+
+  // Fetch user items on component mount
+  useEffect(() => {
+    actions.fetchUserItems();
+  }, []);
 
   const handleTradeProposal = (e) => {
     e.preventDefault();
