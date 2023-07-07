@@ -330,6 +330,13 @@ def create_trade():
     if not data:
         return jsonify({"msg": "Missing JSON in request"}), 400
 
+     # Verificar se pelo menos um produto ou serviço é enviado para cada lado da troca
+    sender_has_item = 'sender_product_id' in data or 'sender_service_id' in data
+    receiver_has_item = 'receiver_product_id' in data or 'receiver_service_id' in data
+
+    if not (sender_has_item and receiver_has_item):
+        return jsonify({"msg": "Sender and receiver must have at least one item (product or service)"}), 400
+
     required_fields = ["receiver_id", "sender_product_id", "receiver_product_id", "sender_service_id", "receiver_service_id", "message"]
     for field in required_fields:
         if field not in data:
